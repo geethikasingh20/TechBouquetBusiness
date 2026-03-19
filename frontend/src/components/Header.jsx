@@ -5,7 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-  const { items } = useCart();
+  const { items, logoutCart } = useCart();
   const { user, logout } = useAuth();
   const [location, setLocation] = useState("Detecting...");
   const navigate = useNavigate();
@@ -20,6 +20,11 @@ export default function Header() {
       () => setLocation("Bengaluru")
     );
   }, []);
+
+  const handleLogout = () => {
+    logoutCart();
+    logout();
+  };
 
   return (
     <header className="site-header">
@@ -41,7 +46,7 @@ export default function Header() {
             {!user.emailVerified && (
               <button className="ghost" onClick={() => navigate("/login")}>Verify Email</button>
             )}
-            <button className="ghost" onClick={logout}>Logout</button>
+            <button className="ghost" onClick={handleLogout}>Logout</button>
           </>
         )}
         <Link to="/cart" className="icon-button">

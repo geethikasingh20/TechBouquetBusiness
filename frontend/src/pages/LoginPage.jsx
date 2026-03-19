@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginApi, verifyEmailApi } from "../data/api";
 
@@ -7,6 +8,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -18,6 +20,7 @@ export default function LoginPage() {
     try {
       const response = await loginApi({ email: form.email, password: form.password });
       login({ name: response.name, email: form.email, emailVerified: response.emailVerified, token: response.token });
+      navigate("/");
     } catch (err) {
       setError("Login failed. Please check your credentials.");
     }

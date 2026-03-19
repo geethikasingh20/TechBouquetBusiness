@@ -48,3 +48,49 @@ export async function fetchProfile(token) {
     }
   });
 }
+
+export async function fetchCart(token) {
+  return apiFetch("/api/cart", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+export async function addCartItem(token, payload) {
+  return apiFetch("/api/cart/items", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function updateCartItem(token, itemId, quantity) {
+  return apiFetch(`/api/cart/items/${itemId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ quantity })
+  });
+}
+
+export async function removeCartItem(token, itemId) {
+  return apiFetch(`/api/cart/items/${itemId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}
+
+export async function clearCartApi(token) {
+  return apiFetch("/api/cart/clear", {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+}

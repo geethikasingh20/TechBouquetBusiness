@@ -41,6 +41,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    localStorage.removeItem(AUTH_KEY);
     setUser(null);
     setProfile(null);
   };
