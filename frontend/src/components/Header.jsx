@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +9,10 @@ export default function Header() {
   const { user, logout } = useAuth();
   const [location, setLocation] = useState("Detecting...");
   const navigate = useNavigate();
+
+  const totalQuantity = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  }, [items]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -49,7 +53,7 @@ export default function Header() {
           </>
         )}
         <Link to="/cart" className="icon-button">
-          Tokri ({items.length})
+          Tokri ({totalQuantity})
         </Link>
         {user && (
           <>
