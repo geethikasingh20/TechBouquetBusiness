@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    # url: jdbc:postgresql://localhost:5432/techbouquet
+    # username: postgres
+    # password: postgres
+    url: jdbc:postgresql://dpg-d6u1oqea2pns739463c0-a.oregon-postgres.render.com:5432/techbouquet_gpt_db?sslmode=require
+    username: techbouquet_gpt_db_user
+    password: utsi1lNtonBIAj7UNHbJCuA6J4zKKC01
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+app:
+  jwt:
+    issuer: techbouquet
+    secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+    ttlMinutes: 1440

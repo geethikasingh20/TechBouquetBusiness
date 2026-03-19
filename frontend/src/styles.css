@@ -1,0 +1,404 @@
+:root {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  color: #1d1b1b;
+  background: #fdf7f2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.page {
+  padding: 32px 8vw 48px;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 8vw;
+  background: #fff2e1;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+  text-decoration: none;
+  color: #2a1912;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location {
+  background: #f8dfc1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2c6aa;
+}
+
+.suggestions {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2c6aa;
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  z-index: 5;
+}
+
+.suggestions button {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: #f15f3f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid #f15f3f;
+  color: #f15f3f;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon-button {
+  background: #fff;
+  border: 1px solid #e2c6aa;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #2a1912;
+}
+
+.category-bar {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.category-item {
+  position: relative;
+  padding: 8px 14px;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 42px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2c6aa;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-item:hover .category-dropdown {
+  display: flex;
+}
+
+.carousel {
+  position: relative;
+  height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.carousel img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.carousel img.active {
+  opacity: 1;
+}
+
+.marquee-section {
+  margin: 20px 0;
+}
+
+.marquee {
+  overflow: hidden;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #f4d9c2;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 24px;
+  padding: 10px 0;
+  animation: scroll 18s linear infinite;
+}
+
+.marquee span {
+  padding: 6px 16px;
+  background: #fff2e1;
+  border-radius: 999px;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.featured .grid,
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.product-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.site-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 16px;
+  background: #fff2e1;
+}
+
+.site-footer a {
+  text-decoration: none;
+  color: #2a1912;
+}
+
+.auth-page {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e2c6aa;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field button {
+  position: absolute;
+  right: 8px;
+  top: 30px;
+  background: transparent;
+  border: none;
+  color: #f15f3f;
+  cursor: pointer;
+}
+
+.reset-box,
+.welcome-box {
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f4d9c2;
+  display: grid;
+  gap: 10px;
+}
+
+.product-page {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.product-gallery .main-image {
+  width: 100%;
+  border-radius: 16px;
+  height: 320px;
+  object-fit: cover;
+}
+
+.thumbnail-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.thumbnail-row img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-info {
+  display: grid;
+  gap: 14px;
+}
+
+.addons {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid #f4d9c2;
+  padding-top: 12px;
+}
+
+.cart-page .cart-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.cart-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.cart-actions input {
+  width: 70px;
+  padding: 6px;
+}
+
+.cart-summary {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-page {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 240px 1fr;
+}
+
+.profile-sidebar {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-sidebar button {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #f4d9c2;
+  background: #fff;
+}
+
+.profile-sidebar button.active {
+  background: #f15f3f;
+  color: white;
+}
+
+.profile-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #f4d9c2;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-page {
+    grid-template-columns: 1fr;
+  }
+}
+.error {
+  background: #ffe2d9;
+  color: #a72608;
+  padding: 10px 14px;
+  border-radius: 10px;
+}
