@@ -1,19 +1,34 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { addons, products } from "../data/products";
+import { fetchProductById } from "../data/api";
+import { addons } from "../data/products";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductPage() {
   const { id } = useParams();
-  const product = useMemo(() => products.find((p) => String(p.id) === id), [id]);
   const { addItem } = useCart();
-  const [selectedImage, setSelectedImage] = useState(product?.images[0]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [pincode, setPincode] = useState("");
   const [selectedAddons, setSelectedAddons] = useState([]);
 
-  if (!product) {
-    return <div className="page">Product not found.</div>;
-  }
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchProductById(id);
+        setProduct(data);
+        const firstImage = data.images?.[0]?.url || data.images?.[0];
+        setSelectedImage(firstImage || "");
+      } catch (error) {
+        setProduct(null);
+      }
+    };
+    load();
+  }, [id]);
 
   const toggleAddon = (addon) => {
     setSelectedAddons((prev) =>
@@ -23,16 +38,35 @@ export default function ProductPage() {
     );
   };
 
+  if (!product) {
+    return <div className="page">Product not found.</div>;
+  }
+
+  const handleAdd = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    try {
+      await addItem(product, selectedAddons);
+    } catch (error) {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="page product-page">
       <div className="product-gallery">
         <img src={selectedImage} alt={product.name} className="main-image" />
         <div className="thumbnail-row">
-          {product.images.map((img) => (
-            <button key={img} type="button" onClick={() => setSelectedImage(img)}>
-              <img src={img} alt={product.name} />
-            </button>
-          ))}
+          {(product.images || []).map((img) => {
+            const url = img.url || img;
+            return (
+              <button key={url} type="button" onClick={() => setSelectedImage(url)}>
+                <img src={url} alt={product.name} />
+              </button>
+            );
+          })}
         </div>
       </div>
       <div className="product-info">
@@ -51,7 +85,7 @@ export default function ProductPage() {
           </div>
         )}
 
-        <button className="primary" onClick={() => addItem(product, selectedAddons)}>
+        <button className="primary" onClick={handleAdd}>
           Add to Cart
         </button>
 

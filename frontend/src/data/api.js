@@ -1,12 +1,13 @@
-const API_BASE = "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 export async function apiFetch(path, options = {}) {
+  const { headers = {}, ...rest } = options;
   const response = await fetch(`${API_BASE}${path}`, {
+    ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
+      ...headers
+    }
   });
 
   if (!response.ok) {
@@ -47,6 +48,18 @@ export async function fetchProfile(token) {
       Authorization: `Bearer ${token}`
     }
   });
+}
+
+export async function fetchProducts() {
+  return apiFetch("/api/products");
+}
+
+export async function fetchProductById(id) {
+  return apiFetch(`/api/products/${id}`);
+}
+
+export async function searchProducts(query) {
+  return apiFetch(`/api/products/search?q=${encodeURIComponent(query)}`);
 }
 
 export async function fetchCart(token) {

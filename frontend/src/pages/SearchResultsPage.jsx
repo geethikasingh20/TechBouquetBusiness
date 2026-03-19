@@ -1,14 +1,26 @@
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { searchProducts } from "../data/api";
 
 export default function SearchResultsPage() {
   const [params] = useSearchParams();
   const query = params.get("q") || "";
+  const [results, setResults] = useState([]);
 
-  const results = products.filter((product) =>
-    product.name.toLowerCase().includes(query.toLowerCase())
-  );
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await searchProducts(query);
+        setResults(data);
+      } catch (error) {
+        setResults([]);
+      }
+    };
+    if (query) {
+      load();
+    }
+  }, [query]);
 
   return (
     <div className="page">

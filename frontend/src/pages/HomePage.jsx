@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import Carousel from "../components/Carousel";
 import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { fetchProducts } from "../data/api";
 
 const bouquetBestsellers = [
   "Sunrise Rose Bouquet",
@@ -18,6 +19,20 @@ const hamperBestsellers = [
 ];
 
 export default function HomePage() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (error) {
+        setProducts([]);
+      }
+    };
+    load();
+  }, []);
+
   return (
     <div className="page">
       <section className="category-bar">

@@ -1,5 +1,6 @@
 package com.techbouquet.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +18,7 @@ public class ProductImage {
     @Column(nullable = false)
     private int sortOrder = 0;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;

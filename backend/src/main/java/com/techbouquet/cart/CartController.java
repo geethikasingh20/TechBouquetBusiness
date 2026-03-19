@@ -6,15 +6,19 @@ import com.techbouquet.customer.Customer;
 import com.techbouquet.customer.CustomerRepository;
 import com.techbouquet.product.Product;
 import com.techbouquet.product.ProductRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
+    private static final Logger log = LoggerFactory.getLogger(CartController.class);
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final CustomerRepository customerRepository;
@@ -36,6 +40,7 @@ public class CartController {
     @GetMapping
     public List<CartItemResponse> getCart(java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
+        log.info("Cart fetch user={} items={}", principal.getName(), cart.getItems().size());
         return toResponse(cart.getItems());
     }
 
@@ -55,12 +60,14 @@ public class CartController {
         if (existing.isPresent()) {
             CartItem item = existing.get();
             item.setQuantity(item.getQuantity() + 1);
+            log.info("Cart add existing user={} productId={} qty={}", principal.getName(), product.getId(), item.getQuantity());
         } else {
             CartItem item = new CartItem();
             item.setCart(cart);
             item.setProduct(product);
             item.setAddonsJson(addonsJson);
             cart.getItems().add(item);
+            log.info("Cart add new user={} productId={} qty=1", principal.getName(), product.getId());
         }
 
         cartRepository.save(cart);
@@ -75,6 +82,7 @@ public class CartController {
         for (CartItem item : cart.getItems()) {
             if (item.getId().equals(id)) {
                 item.setQuantity(Math.max(1, request.getQuantity()));
+                log.info("Cart update user={} itemId={} qty={}", principal.getName(), id, item.getQuantity());
             }
         }
         cartRepository.save(cart);
@@ -86,6 +94,7 @@ public class CartController {
         Cart cart = getOrCreateCart(principal);
         cart.getItems().removeIf(item -> item.getId().equals(id));
         cartRepository.save(cart);
+        log.info("Cart remove user={} itemId={}", principal.getName(), id);
         return ResponseEntity.ok(toResponse(cart.getItems()));
     }
 
@@ -94,6 +103,7 @@ public class CartController {
         Cart cart = getOrCreateCart(principal);
         cart.getItems().clear();
         cartRepository.save(cart);
+        log.info("Cart clear user={}", principal.getName());
         return toResponse(cart.getItems());
     }
 

@@ -32,7 +32,7 @@ public class Product {
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();
 
     public Long getId() {

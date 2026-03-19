@@ -6,12 +6,15 @@ import com.techbouquet.product.Product;
 import com.techbouquet.product.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/analytics")
 public class AnalyticsController {
+    private static final Logger log = LoggerFactory.getLogger(AnalyticsController.class);
     private final AnalyticsRepository analyticsRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
@@ -46,6 +49,8 @@ public class AnalyticsController {
         }
 
         analyticsRepository.save(event);
+        log.info("Analytics event type={} productId={} keyword={} user={}",
+                request.getEventType(), request.getProductId(), request.getKeyword(), principal != null ? principal.getName() : "guest");
         return ResponseEntity.ok().build();
     }
 

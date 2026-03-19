@@ -1,16 +1,29 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { products } from "../data/products";
+import { fetchProducts } from "../data/api";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
+  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchProducts();
+        setProducts(data);
+      } catch (error) {
+        setProducts([]);
+      }
+    };
+    load();
+  }, []);
 
   const suggestions = useMemo(() => {
     if (query.trim().length < 3) return [];
     const lower = query.toLowerCase();
     return products.filter((p) => p.name.toLowerCase().includes(lower)).slice(0, 6);
-  }, [query]);
+  }, [query, products]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

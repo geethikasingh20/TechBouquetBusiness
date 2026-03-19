@@ -5,7 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-  const { items, logoutCart } = useCart();
+  const { items } = useCart();
   const { user, logout } = useAuth();
   const [location, setLocation] = useState("Detecting...");
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
-    logoutCart();
     logout();
   };
 

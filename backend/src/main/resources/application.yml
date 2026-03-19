@@ -17,6 +17,10 @@ spring:
         format_sql: true
     open-in-view: false
 
+logging:
+  level:
+    com.techbouquet: INFO
+
 app:
   jwt:
     issuer: techbouquet
