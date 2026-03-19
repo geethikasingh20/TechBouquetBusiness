@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchProductById } from "../data/api";
 import { addons } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -12,12 +11,14 @@ export default function ProductPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
   const [pincode, setPincode] = useState("");
   const [selectedAddons, setSelectedAddons] = useState([]);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const data = await fetchProductById(id);
         setProduct(data);
@@ -25,6 +26,8 @@ export default function ProductPage() {
         setSelectedImage(firstImage || "");
       } catch (error) {
         setProduct(null);
+      } finally {
+        setLoading(false);
       }
     };
     load();
@@ -38,10 +41,6 @@ export default function ProductPage() {
     );
   };
 
-  if (!product) {
-    return <div className="page">Product not found.</div>;
-  }
-
   const handleAdd = async () => {
     if (!user) {
       navigate("/login");
@@ -53,6 +52,14 @@ export default function ProductPage() {
       navigate("/login");
     }
   };
+
+  if (loading) {
+    return <div className="page">Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div className="page">Product not found.</div>;
+  }
 
   return (
     <div className="page product-page">

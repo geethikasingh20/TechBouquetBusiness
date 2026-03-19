@@ -20,6 +20,7 @@ const hamperBestsellers = [
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -28,6 +29,8 @@ export default function HomePage() {
         setProducts(data);
       } catch (error) {
         setProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
     load();
@@ -61,11 +64,15 @@ export default function HomePage() {
 
       <section className="featured">
         <h3>Featured Products</h3>
-        <div className="grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <p>Loading products...</p>
+        ) : (
+          <div className="grid">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

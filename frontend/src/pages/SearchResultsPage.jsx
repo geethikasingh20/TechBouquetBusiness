@@ -7,14 +7,18 @@ export default function SearchResultsPage() {
   const [params] = useSearchParams();
   const query = params.get("q") || "";
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const data = await searchProducts(query);
         setResults(data);
       } catch (error) {
         setResults([]);
+      } finally {
+        setLoading(false);
       }
     };
     if (query) {
@@ -25,7 +29,9 @@ export default function SearchResultsPage() {
   return (
     <div className="page">
       <h2>Search Results for "{query}"</h2>
-      {results.length === 0 ? (
+      {loading ? (
+        <p>Searching...</p>
+      ) : results.length === 0 ? (
         <p>No matching products found.</p>
       ) : (
         <div className="grid">

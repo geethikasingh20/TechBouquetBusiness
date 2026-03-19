@@ -1,14 +1,16 @@
 import { useCart } from "../context/CartContext";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, clearCart } = useCart();
+  const { items, updateQuantity, removeItem, clearCart, loading } = useCart();
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="page cart-page">
       <h2>Your Cart</h2>
-      {items.length === 0 ? (
+      {loading && items.length === 0 ? (
+        <p>Loading your cart...</p>
+      ) : items.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
         <div className="cart-list">
