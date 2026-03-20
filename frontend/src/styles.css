@@ -1636,3 +1636,36 @@ body {
   background: #ffffff;
 }
 
+
+.flower-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #c9a46a;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.flower-icon {
+  font-size: 16px;
+}
+
+.rating-text {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+
+.flower-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: #c9a46a;
+}
+
+
+.rating-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+

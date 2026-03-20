@@ -62,6 +62,8 @@ export default function ProductPage() {
 
   const categoryName = product.category || "";
   const subcategoryName = product.subcategory || "";
+  const ratingValue = Number(product.rating || 5).toFixed(1);
+  const ratingRounded = Math.round(Number(product.rating || 5));
 
   return (
     <div className="page">
@@ -101,7 +103,12 @@ export default function ProductPage() {
         </div>
         <div className="product-info">
           <h2>{product.name}</h2>
-          <p className="reviews">Flower Reviews: ????????</p>
+          <div className="flower-rating" aria-label={`Rating ${ratingValue} out of 5`}>
+            {Array.from({ length: ratingRounded }).map((_, idx) => (
+              <img key={idx} src="/rating.png" alt="Rating" className="rating-icon" />
+            ))}
+            <span className="rating-text">{ratingValue}</span>
+          </div>
           <p className="price">Rs. {product.price}</p>
 
           <label>

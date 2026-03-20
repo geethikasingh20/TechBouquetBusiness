@@ -23,6 +23,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Sunrise Rose Bouquet",
                 "Fresh roses with baby breath and greens.",
                 new BigDecimal("1299"),
+                new BigDecimal("4.8"),
                 "Bouquets",
                 "Fresh Flowers",
                 List.of(
@@ -35,6 +36,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Pastel Tulip Wrap",
                 "Soft pastel tulips in kraft wrap.",
                 new BigDecimal("999"),
+                new BigDecimal("3"),
                 "Bouquets",
                 "Fresh Flowers",
                 List.of(
@@ -47,6 +49,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Peace Lily Plant",
                 "Low maintenance indoor plant.",
                 new BigDecimal("799"),
+                new BigDecimal("4.6"),
                 "Plants",
                 "Decoration Plants",
                 List.of(
@@ -58,6 +61,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Celebration Gift Hamper",
                 "Snacks, chocolates, and a greeting card.",
                 new BigDecimal("1599"),
+                new BigDecimal("4.9"),
                 "Gift Hampers",
                 "Gift Hampers",
                 List.of(
@@ -69,10 +73,23 @@ public class ProductSeeder implements CommandLineRunner {
                 "Chocolate Truffle Cake",
                 "Rich chocolate cake for celebrations.",
                 new BigDecimal("899"),
+                new BigDecimal("4.5"),
                 "Cakes",
                 "Cakes",
                 List.of(
                         "https://theobroma.in/cdn/shop/files/DutchTruffleCakeonekg.jpg?v=1711125197"
+                )
+        );
+
+         seedProduct(
+                "Red rose bouquet",
+                "Red rose bouquet for expressing love",
+                new BigDecimal("999"),
+                new BigDecimal("4"),
+                "Bouquets",
+                "Fresh Flowers",
+                List.of(
+                        "https://tse3.mm.bing.net/th/id/OIP.y1Au71wsTqb-WaBhSyR_hQHaK0?rs=1&pid=ImgDetMain&o=7&rm=3"
                 )
         );
     }
@@ -80,6 +97,7 @@ public class ProductSeeder implements CommandLineRunner {
     private void seedProduct(String name,
                              String description,
                              BigDecimal price,
+                             BigDecimal rating,
                              String category,
                              String subcategory,
                              List<String> imageUrls) {
@@ -87,6 +105,7 @@ public class ProductSeeder implements CommandLineRunner {
         product.setName(name);
         product.setDescription(description);
         product.setPrice(price);
+        product.setRating(rating);
         product.setCategory(category);
         product.setSubcategory(subcategory);
 
