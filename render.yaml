@@ -1,7 +1,8 @@
 services:
   - type: web
     name: techbouquet-backend
-    env: java
+    runtime: java
+    plan: free
     rootDir: backend
     buildCommand: mvn -DskipTests package
     startCommand: java -jar target/*.jar
@@ -27,11 +28,13 @@ services:
       - key: EMAIL_BG_URL
         sync: false
 
-  - type: static_site
+  - type: web
     name: techbouquet-frontend
+    runtime: static
+    plan: free
     rootDir: frontend
     buildCommand: npm ci && npm run build
-    publishDir: dist
+    staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
