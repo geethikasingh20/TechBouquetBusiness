@@ -12,6 +12,7 @@ export default function ProductPage() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [pincode, setPincode] = useState("");
   const [selectedAddons, setSelectedAddons] = useState([]);
@@ -46,7 +47,9 @@ export default function ProductPage() {
       navigate("/login");
       return;
     }
+    setAdding(true);
     await addItem(product, selectedAddons);
+    setAdding(false);
   };
 
   if (loading) {
@@ -88,8 +91,14 @@ export default function ProductPage() {
           </div>
         )}
 
-        <button className="primary" onClick={handleAdd}>
-          Add to Cart
+        <button className="primary" onClick={handleAdd} disabled={adding}>
+          {adding ? (
+            <span className="btn-loading">
+              <span className="spinner" /> Adding...
+            </span>
+          ) : (
+            "Add to Cart"
+          )}
         </button>
 
         <div className="addons">

@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart, loading } = useCart();
   const [localQty, setLocalQty] = useState({});
+  const [pending, setPending] = useState({});
   const timersRef = useRef({});
 
   useEffect(() => {
@@ -20,8 +21,10 @@ export default function CartPage() {
     if (timersRef.current[id]) {
       clearTimeout(timersRef.current[id]);
     }
-    timersRef.current[id] = setTimeout(() => {
-      updateQuantity(id, safeValue);
+    timersRef.current[id] = setTimeout(async () => {
+      setPending((prev) => ({ ...prev, [id]: true }));
+      await updateQuantity(id, safeValue);
+      setPending((prev) => ({ ...prev, [id]: false }));
       delete timersRef.current[id];
     }, 400);
   };
@@ -54,6 +57,7 @@ export default function CartPage() {
                     type="button"
                     className="ghost"
                     onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
+                    disabled={pending[item.id]}
                   >
                     -
                   </button>
@@ -62,17 +66,22 @@ export default function CartPage() {
                     min="1"
                     value={localQty[item.id] ?? item.quantity}
                     onChange={(event) => scheduleUpdate(item.id, event.target.value)}
+                    disabled={pending[item.id]}
                   />
                   <button
                     type="button"
                     className="ghost"
                     onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) + 1)}
+                    disabled={pending[item.id]}
                   >
                     +
                   </button>
+                  {pending[item.id] && <span className="spinner small" />}
                 </div>
                 <p>Total: Rs. {item.price * item.quantity}</p>
-                <button className="ghost" onClick={() => removeItem(item.id)}>Remove</button>
+                <button className="ghost" onClick={() => removeItem(item.id)} disabled={pending[item.id]}>
+                  Remove
+                </button>
               </div>
             </div>
           ))}
