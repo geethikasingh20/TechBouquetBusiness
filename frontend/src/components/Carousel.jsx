@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
+import slide1 from "../assets/carousel1.png";
+import slide2 from "../assets/carousel2.png";
+import slide3 from "../assets/carousel3.jpg";
 
-const slides = [
-  "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=1400&q=80"
-];
+const slides = [slide1, slide2, slide3];
 
 export default function Carousel() {
   const [index, setIndex] = useState(0);
