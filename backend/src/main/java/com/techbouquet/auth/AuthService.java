@@ -10,6 +10,7 @@ import com.techbouquet.email.SendGridEmailService;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,12 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final SendGridEmailService emailService;
+
+    @Value("${app.email.verifyUrlBase:http://localhost:8080/api/auth/verify-email?token=}")
+    private String verifyUrlBase;
+
+    @Value("${app.email.verifyTtlMinutes:1440}")
+    private long verifyTtlMinutes;
 
     public AuthService(CustomerRepository customerRepository,
                        PasswordEncoder passwordEncoder,
@@ -52,11 +59,15 @@ public class AuthService {
 
         Customer saved = customerRepository.save(customer);
         log.info("Registered user id={} email={}", saved.getId(), saved.getEmail());
+
         try {
-            emailService.sendWelcomeEmail(saved.getEmail(), saved.getName());
+            String verifyToken = jwtService.generateEmailVerificationToken(saved.getEmail(), verifyTtlMinutes);
+            String verifyLink = verifyUrlBase + verifyToken;
+            emailService.sendWelcomeEmail(saved.getEmail(), saved.getName(), verifyLink);
         } catch (Exception ex) {
             log.warn("Welcome email failed for {}", saved.getEmail(), ex);
         }
+
         String token = jwtService.generateToken(saved.getEmail());
         return new AuthResponse(token, saved.getName(), saved.isEmailVerified());
     }
@@ -84,5 +95,13 @@ public class AuthService {
         customer.setEmailVerified(true);
         customerRepository.save(customer);
         log.info("Email verified user={}", email);
+    }
+
+    public void verifyEmailToken(String token) {
+        String email = jwtService.validateEmailVerificationToken(token);
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Invalid or expired verification token");
+        }
+        markEmailVerified(email);
     }
 }

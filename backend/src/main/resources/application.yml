@@ -29,6 +29,11 @@ app:
     secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
     ttlMinutes: 1440
   email:
+    verifyUrlBase: ${VERIFY_EMAIL_URL_BASE:http://localhost:8080/api/auth/verify-email?token=}
+    verifyTtlMinutes: ${VERIFY_EMAIL_TTL_MINUTES:1440}
+    assets:
+      logoUrl: ${EMAIL_LOGO_URL:}
+      backgroundUrl: ${EMAIL_BG_URL:}
     sendgrid:
       apiKey: ${SENDGRID_API_KEY:}
       fromEmail: ${SENDGRID_FROM_EMAIL:}

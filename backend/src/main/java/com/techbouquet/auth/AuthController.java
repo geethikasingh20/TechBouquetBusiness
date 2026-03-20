@@ -44,6 +44,12 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<String> verifyEmailLink(@RequestParam("token") String token) {
+        authService.verifyEmailToken(token);
+        return ResponseEntity.ok("Email verified successfully. You can return to the app.");
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         log.info("Logout request");

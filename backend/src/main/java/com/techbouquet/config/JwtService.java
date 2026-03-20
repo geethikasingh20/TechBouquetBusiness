@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,19 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateEmailVerificationToken(String email, long verifyTtlMinutes) {
+        Instant now = Instant.now();
+        Instant expiry = now.plusSeconds(verifyTtlMinutes * 60);
+        return Jwts.builder()
+                .issuer(issuer)
+                .subject(email)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiry))
+                .claims(Map.of("typ", "verify"))
+                .signWith(secretKey)
+                .compact();
+    }
+
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
@@ -43,6 +57,18 @@ public class JwtService {
     public boolean isTokenValid(String token, String username) {
         Claims claims = extractAllClaims(token);
         return claims.getSubject().equals(username) && !claims.getExpiration().before(new Date());
+    }
+
+    public String validateEmailVerificationToken(String token) {
+        Claims claims = extractAllClaims(token);
+        String type = claims.get("typ", String.class);
+        if (!"verify".equals(type)) {
+            return null;
+        }
+        if (claims.getExpiration().before(new Date())) {
+            return null;
+        }
+        return claims.getSubject();
     }
 
     private Claims extractAllClaims(String token) {
