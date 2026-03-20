@@ -1108,3 +1108,18 @@ body {
   padding: 0 8vw;
 }
 
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 0 6px;
+  background: #ffffff;
+}
+
+.auth-logo {
+  height: 72px;
+  width: auto;
+  display: block;
+}
+
