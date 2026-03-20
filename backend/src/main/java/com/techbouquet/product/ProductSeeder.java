@@ -26,8 +26,8 @@ public class ProductSeeder implements CommandLineRunner {
                 "Bouquets",
                 "Fresh Flowers",
                 List.of(
-                        "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=800&q=80"
+                        "https://freshknots.in/wp-content/uploads/2022/12/2.jpg",
+                        "https://freshknots.in/wp-content/uploads/2022/12/3-540x540.jpg"
                 )
         );
 
@@ -38,8 +38,8 @@ public class ProductSeeder implements CommandLineRunner {
                 "Bouquets",
                 "Fresh Flowers",
                 List.of(
-                        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=800&q=80"
+                        "https://www.atfleurs.com/cdn/shop/files/oLV3Ge7Ez4BqZcDO5OQ3um7CZXQKYi4NMAluHGLa.png?v=1772017536",
+                        "https://www.atfleurs.com/cdn/shop/files/ydXHv9iFDM1Yr3sOaxeY4hTCK3QOCj0FIDR000p5.png?v=1772017539"
                 )
         );
 
@@ -50,7 +50,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Plants",
                 "Decoration Plants",
                 List.of(
-                        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
+                        "https://m.media-amazon.com/images/I/61M5cotkK+L._AC_UF1000,1000_QL80_.jpg"
                 )
         );
 
@@ -61,7 +61,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Gift Hampers",
                 "Gift Hampers",
                 List.of(
-                        "https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=800&q=80"
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7NDNDjMFXe2hGAvYg1i2iKKQlIA3YX1qdmA&s"
                 )
         );
 
@@ -72,7 +72,7 @@ public class ProductSeeder implements CommandLineRunner {
                 "Cakes",
                 "Cakes",
                 List.of(
-                        "https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=800&q=80"
+                        "https://theobroma.in/cdn/shop/files/DutchTruffleCakeonekg.jpg?v=1711125197"
                 )
         );
     }
