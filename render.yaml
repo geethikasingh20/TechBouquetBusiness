@@ -27,7 +27,7 @@ services:
       - key: EMAIL_BG_URL
         sync: false
 
-  - type: static
+  - type: static_site
     name: techbouquet-frontend
     rootDir: frontend
     buildCommand: npm ci && npm run build
