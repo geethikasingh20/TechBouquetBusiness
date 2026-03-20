@@ -39,7 +39,7 @@ public class CartController {
     @GetMapping
     public List<CartItemResponse> getCart(java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        List<CartItem> items = cartItemRepository.findByCart(cart);
+        List<CartItem> items = cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart);
         log.info("Cart fetch user={} items={}", principal.getName(), items.size());
         return toResponse(items);
     }
@@ -56,24 +56,20 @@ public class CartController {
         cartItemRepository.upsertIncrement(cart.getId(), product.getId(), addonsJson);
         log.info("Cart add upsert user={} productId={}", principal.getName(), product.getId());
 
-        List<CartItem> items = cartItemRepository.findByCart(cart);
+        List<CartItem> items = cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart);
         return toResponse(items);
     }
 
     @PatchMapping("/items/{id}")
+    @Transactional
     public ResponseEntity<List<CartItemResponse>> updateQuantity(@PathVariable Long id,
                                                                  @RequestBody CartItemQuantityRequest request,
                                                                  java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        List<CartItem> items = cartItemRepository.findByCart(cart);
-        for (CartItem item : items) {
-            if (item.getId().equals(id)) {
-                item.setQuantity(Math.max(1, request.getQuantity()));
-                cartItemRepository.save(item);
-                log.info("Cart update user={} itemId={} qty={}", principal.getName(), id, item.getQuantity());
-            }
-        }
-        return ResponseEntity.ok(toResponse(cartItemRepository.findByCart(cart)));
+        int qty = Math.max(1, request.getQuantity());
+        cartItemRepository.updateQuantityAndTouch(id, qty);
+        log.info("Cart update user={} itemId={} qty={}", principal.getName(), id, qty);
+        return ResponseEntity.ok(toResponse(cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart)));
     }
 
     @DeleteMapping("/items/{id}")
@@ -81,13 +77,13 @@ public class CartController {
         Cart cart = getOrCreateCart(principal);
         cartItemRepository.deleteById(id);
         log.info("Cart remove user={} itemId={}", principal.getName(), id);
-        return ResponseEntity.ok(toResponse(cartItemRepository.findByCart(cart)));
+        return ResponseEntity.ok(toResponse(cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart)));
     }
 
     @DeleteMapping("/clear")
     public List<CartItemResponse> clear(java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        cartItemRepository.findByCart(cart).forEach(item -> cartItemRepository.deleteById(item.getId()));
+        cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart).forEach(item -> cartItemRepository.deleteById(item.getId()));
         log.info("Cart clear user={}", principal.getName());
         return List.of();
     }

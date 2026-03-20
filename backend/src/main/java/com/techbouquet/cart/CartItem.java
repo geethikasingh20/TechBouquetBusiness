@@ -3,6 +3,7 @@ package com.techbouquet.cart;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.techbouquet.product.Product;
 import jakarta.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "cart_items", uniqueConstraints = {
@@ -28,12 +29,16 @@ public class CartItem {
     @Column(name = "addons_json", length = 4000, nullable = false)
     private String addonsJson;
 
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
     @PrePersist
     @PreUpdate
-    private void ensureAddonsJson() {
+    private void ensureDefaults() {
         if (addonsJson == null || addonsJson.isBlank()) {
             addonsJson = "[]";
         }
+        updatedAt = Instant.now();
     }
 
     public Long getId() {
@@ -74,5 +79,13 @@ public class CartItem {
 
     public void setAddonsJson(String addonsJson) {
         this.addonsJson = addonsJson;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

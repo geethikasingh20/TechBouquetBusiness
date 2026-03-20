@@ -1,7 +1,29 @@
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart, loading } = useCart();
+  const [localQty, setLocalQty] = useState({});
+  const timersRef = useRef({});
+
+  useEffect(() => {
+    const next = {};
+    items.forEach((item) => {
+      next[item.id] = item.quantity;
+    });
+    setLocalQty(next);
+  }, [items]);
+
+  const scheduleUpdate = (id, value) => {
+    setLocalQty((prev) => ({ ...prev, [id]: value }));
+    if (timersRef.current[id]) {
+      clearTimeout(timersRef.current[id]);
+    }
+    timersRef.current[id] = setTimeout(() => {
+      updateQuantity(id, value);
+      delete timersRef.current[id];
+    }, 500);
+  };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -29,8 +51,8 @@ export default function CartPage() {
                 <input
                   type="number"
                   min="1"
-                  value={item.quantity}
-                  onChange={(event) => updateQuantity(item.id, Number(event.target.value))}
+                  value={localQty[item.id] ?? item.quantity}
+                  onChange={(event) => scheduleUpdate(item.id, Number(event.target.value))}
                 />
                 <p>Total: Rs. {item.price * item.quantity}</p>
                 <button className="ghost" onClick={() => removeItem(item.id)}>Remove</button>
