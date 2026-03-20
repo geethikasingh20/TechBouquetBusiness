@@ -1097,3 +1097,14 @@ body {
   stroke-linejoin: round;
 }
 
+
+.page {
+  padding: 20px 8vw 48px;
+}
+
+.category-bar {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  padding: 0 8vw;
+}
+
