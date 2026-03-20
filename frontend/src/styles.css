@@ -1012,3 +1012,40 @@ body {
   box-shadow: 0 0 0 2px #9ca3af;
 }
 
+
+
+.primary {
+  background: #c08a3f;
+}
+
+.ghost {
+  border-color: #c08a3f;
+  color: #c08a3f;
+}
+
+.spinner {
+  border-top-color: #c08a3f;
+}
+
+.cart-link:hover {
+  color: #c08a3f;
+}
+
+
+.primary {
+  background: #d6a860;
+}
+
+.ghost {
+  border-color: #d6a860;
+  color: #d6a860;
+}
+
+.spinner {
+  border-top-color: #d6a860;
+}
+
+.cart-link:hover {
+  color: #d6a860;
+}
+

@@ -59,6 +59,18 @@ export default function RegisterPage() {
     return Object.keys(errors).length === 0;
   };
 
+  const extractErrorMessage = (err) => {
+    if (!err) return "Registration failed. Please try again.";
+    const raw = err.message || "";
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed?.message) return parsed.message;
+    } catch {
+      // ignore parse errors
+    }
+    return raw || "Registration failed. Please try again.";
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
@@ -73,7 +85,12 @@ export default function RegisterPage() {
       login({ name: response.name, email: form.email, emailVerified: response.emailVerified, token: response.token });
       navigate("/");
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      const message = extractErrorMessage(err);
+      if (message.toLowerCase().includes("email") && message.toLowerCase().includes("exist")) {
+        setError("This email is already registered. Please login or use a different email.");
+      } else {
+        setError(message || "Registration failed. Please try again.");
+      }
     }
   };
 
