@@ -14,6 +14,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import PolicyPage from "./pages/PolicyPage";
 import HelpPage from "./pages/HelpPage";
+import CategoryPage from "./pages/CategoryPage";
 
 export default function App() {
   const location = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/policy" element={<PolicyPage />} />
           <Route path="/help" element={<HelpPage />} />
+          <Route path="/category/:category" element={<CategoryPage />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

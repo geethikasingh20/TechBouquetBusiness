@@ -1,22 +1,49 @@
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
+const subcategories = {
+  Bouquets: ["Fresh Flowers", "Dry Flowers"],
+  Plants: ["Flower Plants", "Decoration Plants"],
+  "Gift Hampers": ["Gift Hampers"],
+  Cakes: ["Cakes"]
+};
+
 export default function CategoryBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goCategory = (category, sub) => {
+    const base = `/category/${encodeURIComponent(category)}`;
+    if (sub) {
+      navigate(`${base}?sub=${encodeURIComponent(sub)}`);
+      return;
+    }
+    navigate(base);
+  };
+
   return (
     <section className="category-bar">
-      <div className="category-item">
-        Bouquets
-        <div className="category-dropdown">
-          <span>Fresh Flowers</span>
-          <span>Dry Flowers</span>
+      {Object.keys(subcategories).map((category) => (
+        <div key={category} className="category-item">
+          <button
+            type="button"
+            className="category-link"
+            onClick={() => goCategory(category)}
+          >
+            {category}
+          </button>
+          <div className="category-dropdown">
+            {subcategories[category].map((sub) => (
+              <button
+                key={sub}
+                type="button"
+                onClick={() => goCategory(category, sub)}
+              >
+                {sub}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="category-item">
-        Plants
-        <div className="category-dropdown">
-          <span>Flower Plants</span>
-          <span>Decoration Plants</span>
-        </div>
-      </div>
-      <div className="category-item">Gift Hampers</div>
-      <div className="category-item">Decoration Services</div>
+      ))}
     </section>
   );
 }
