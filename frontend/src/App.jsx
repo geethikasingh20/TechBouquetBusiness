@@ -10,6 +10,10 @@ import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import PolicyPage from "./pages/PolicyPage";
+import HelpPage from "./pages/HelpPage";
 
 export default function App() {
   const location = useLocation();
@@ -29,6 +33,10 @@ export default function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<SearchResultsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/policy" element={<PolicyPage />} />
+          <Route path="/help" element={<HelpPage />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

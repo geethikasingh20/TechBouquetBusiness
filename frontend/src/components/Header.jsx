@@ -12,6 +12,7 @@ export default function Header() {
   const { user, logout } = useAuth();
   const [location, setLocation] = useState({ city: "", state: "", pincode: "" });
   const [loggingOut, setLoggingOut] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const totalQuantity = useMemo(() => {
@@ -67,9 +68,24 @@ export default function Header() {
 
   return (
     <header className="site-header">
-      <button className="icon-button menu-button" type="button" aria-label="Menu">
-        <span className="menu-lines"></span>
-      </button>
+      <div className="menu-wrapper">
+        <button
+          className="icon-button menu-button"
+          type="button"
+          aria-label="Menu"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <span className="menu-lines"></span>
+        </button>
+        {menuOpen && (
+          <div className="menu-dropdown" onMouseLeave={() => setMenuOpen(false)}>
+            <Link to="/about" onClick={() => setMenuOpen(false)}>About Us</Link>
+            <Link to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</Link>
+            <Link to="/policy" onClick={() => setMenuOpen(false)}>Policy</Link>
+            <Link to="/help" onClick={() => setMenuOpen(false)}>Help</Link>
+          </div>
+        )}
+      </div>
       <div className="header-left">
         <Link to="/" className="logo">
           <img src={logoImage} alt="TechBouquet" className="logo-image" />
