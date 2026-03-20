@@ -6,13 +6,12 @@ import com.techbouquet.customer.Customer;
 import com.techbouquet.customer.CustomerRepository;
 import com.techbouquet.product.Product;
 import com.techbouquet.product.ProductRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,38 +39,25 @@ public class CartController {
     @GetMapping
     public List<CartItemResponse> getCart(java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        log.info("Cart fetch user={} items={}", principal.getName(), cart.getItems().size());
-        return toResponse(cart.getItems());
+        List<CartItem> items = cartItemRepository.findByCart(cart);
+        log.info("Cart fetch user={} items={}", principal.getName(), items.size());
+        return toResponse(items);
     }
 
     @PostMapping("/items")
-    public List<CartItemResponse> addItem(@RequestBody CartItemRequest request, java.security.Principal principal) throws Exception {
+    @Transactional
+    public List<CartItemResponse> addItem(@RequestBody CartItemRequest request, java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        String addonsJson = request.getAddonsJson() == null ? "[]" : request.getAddonsJson();
+        String addonsJson = normalizeAddonsJson(request.getAddonsJson());
 
-        Optional<CartItem> existing = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId())
-                        && addonsJson.equals(item.getAddonsJson()))
-                .findFirst();
+        cartItemRepository.upsertIncrement(cart.getId(), product.getId(), addonsJson);
+        log.info("Cart add upsert user={} productId={}", principal.getName(), product.getId());
 
-        if (existing.isPresent()) {
-            CartItem item = existing.get();
-            item.setQuantity(item.getQuantity() + 1);
-            log.info("Cart add existing user={} productId={} qty={}", principal.getName(), product.getId(), item.getQuantity());
-        } else {
-            CartItem item = new CartItem();
-            item.setCart(cart);
-            item.setProduct(product);
-            item.setAddonsJson(addonsJson);
-            cart.getItems().add(item);
-            log.info("Cart add new user={} productId={} qty=1", principal.getName(), product.getId());
-        }
-
-        cartRepository.save(cart);
-        return toResponse(cart.getItems());
+        List<CartItem> items = cartItemRepository.findByCart(cart);
+        return toResponse(items);
     }
 
     @PatchMapping("/items/{id}")
@@ -79,32 +65,31 @@ public class CartController {
                                                                  @RequestBody CartItemQuantityRequest request,
                                                                  java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        for (CartItem item : cart.getItems()) {
+        List<CartItem> items = cartItemRepository.findByCart(cart);
+        for (CartItem item : items) {
             if (item.getId().equals(id)) {
                 item.setQuantity(Math.max(1, request.getQuantity()));
+                cartItemRepository.save(item);
                 log.info("Cart update user={} itemId={} qty={}", principal.getName(), id, item.getQuantity());
             }
         }
-        cartRepository.save(cart);
-        return ResponseEntity.ok(toResponse(cart.getItems()));
+        return ResponseEntity.ok(toResponse(cartItemRepository.findByCart(cart)));
     }
 
     @DeleteMapping("/items/{id}")
     public ResponseEntity<List<CartItemResponse>> removeItem(@PathVariable Long id, java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        cart.getItems().removeIf(item -> item.getId().equals(id));
-        cartRepository.save(cart);
+        cartItemRepository.deleteById(id);
         log.info("Cart remove user={} itemId={}", principal.getName(), id);
-        return ResponseEntity.ok(toResponse(cart.getItems()));
+        return ResponseEntity.ok(toResponse(cartItemRepository.findByCart(cart)));
     }
 
     @DeleteMapping("/clear")
     public List<CartItemResponse> clear(java.security.Principal principal) {
         Cart cart = getOrCreateCart(principal);
-        cart.getItems().clear();
-        cartRepository.save(cart);
+        cartItemRepository.findByCart(cart).forEach(item -> cartItemRepository.deleteById(item.getId()));
         log.info("Cart clear user={}", principal.getName());
-        return toResponse(cart.getItems());
+        return List.of();
     }
 
     private Cart getOrCreateCart(java.security.Principal principal) {
@@ -116,6 +101,13 @@ public class CartController {
                     cart.setCustomer(customer);
                     return cartRepository.save(cart);
                 });
+    }
+
+    private String normalizeAddonsJson(String addonsJson) {
+        if (addonsJson == null || addonsJson.isBlank()) {
+            return "[]";
+        }
+        return addonsJson;
     }
 
     private List<CartItemResponse> toResponse(List<CartItem> items) {

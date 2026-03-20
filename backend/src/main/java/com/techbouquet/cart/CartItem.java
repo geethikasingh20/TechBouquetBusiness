@@ -5,7 +5,9 @@ import com.techbouquet.product.Product;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_items", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"cart_id", "product_id", "addons_json"})
+})
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +25,16 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity = 1;
 
-    @Column(length = 4000)
+    @Column(name = "addons_json", length = 4000, nullable = false)
     private String addonsJson;
+
+    @PrePersist
+    @PreUpdate
+    private void ensureAddonsJson() {
+        if (addonsJson == null || addonsJson.isBlank()) {
+            addonsJson = "[]";
+        }
+    }
 
     public Long getId() {
         return id;

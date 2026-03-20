@@ -46,11 +46,7 @@ export default function ProductPage() {
       navigate("/login");
       return;
     }
-    try {
-      await addItem(product, selectedAddons);
-    } catch (error) {
-      navigate("/login");
-    }
+    await addItem(product, selectedAddons);
   };
 
   if (loading) {

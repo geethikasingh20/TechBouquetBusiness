@@ -4,8 +4,14 @@ import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
+function normalizeAddons(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function sameAddons(a, b) {
-  return JSON.stringify(a || []) === JSON.stringify(b || []);
+  const left = normalizeAddons(a);
+  const right = normalizeAddons(b);
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 export function CartProvider({ children }) {
@@ -37,10 +43,12 @@ export function CartProvider({ children }) {
       throw new Error("LOGIN_REQUIRED");
     }
 
+    const safeAddons = normalizeAddons(addons);
+
     // Optimistic update
     setItems((prev) => {
       const existing = prev.find(
-        (item) => item.productId === product.id && sameAddons(item.addons, addons)
+        (item) => item.productId === product.id && sameAddons(item.addons, safeAddons)
       );
       if (existing) {
         return prev.map((item) =>
@@ -55,7 +63,7 @@ export function CartProvider({ children }) {
           name: product.name,
           price: Number(product.price),
           quantity: 1,
-          addons
+          addons: safeAddons
         }
       ];
     });
@@ -63,14 +71,13 @@ export function CartProvider({ children }) {
     try {
       const data = await addCartItem(user.token, {
         productId: product.id,
-        addonsJson: JSON.stringify(addons)
+        addonsJson: JSON.stringify(safeAddons)
       });
       setItems(data);
     } catch (error) {
-      // Revert by refetching
       const data = await fetchCart(user.token);
       setItems(data);
-      throw error;
+      return;
     }
   };
 

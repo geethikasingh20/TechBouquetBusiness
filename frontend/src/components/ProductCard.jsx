@@ -12,11 +12,7 @@ export default function ProductCard({ product }) {
       navigate("/login");
       return;
     }
-    try {
-      await addItem(product);
-    } catch (error) {
-      navigate("/login");
-    }
+    await addItem(product);
   };
 
   return (
