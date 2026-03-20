@@ -64,7 +64,7 @@ export default function ProductPage() {
   const subcategoryName = product.subcategory || "";
 
   return (
-    <div className="page product-page">
+    <div className="page">
       <nav className="breadcrumbs">
         <Link to="/">Home</Link>
         {categoryName && (
@@ -85,57 +85,59 @@ export default function ProductPage() {
         <span>{product.name}</span>
       </nav>
 
-      <div className="product-gallery">
-        <img src={selectedImage} alt={product.name} className="main-image" />
-        <div className="thumbnail-row">
-          {(product.images || []).map((img) => {
-            const url = img.url || img;
-            return (
-              <button key={url} type="button" onClick={() => setSelectedImage(url)}>
-                <img src={url} alt={product.name} />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <div className="product-info">
-        <h2>{product.name}</h2>
-        <p className="reviews">Flower Reviews: ????????</p>
-        <p className="price">Rs. {product.price}</p>
-
-        <label>
-          Delivery Pincode
-          <input value={pincode} onChange={(event) => setPincode(event.target.value)} />
-        </label>
-        {pincode && (
-          <div className="delivery-options">
-            <button className="ghost">Tomorrow</button>
-            <button className="ghost">Later</button>
+      <div className="product-page">
+        <div className="product-gallery">
+          <img src={selectedImage} alt={product.name} className="main-image" />
+          <div className="thumbnail-row">
+            {(product.images || []).map((img) => {
+              const url = img.url || img;
+              return (
+                <button key={url} type="button" onClick={() => setSelectedImage(url)}>
+                  <img src={url} alt={product.name} />
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
+        <div className="product-info">
+          <h2>{product.name}</h2>
+          <p className="reviews">Flower Reviews: ????????</p>
+          <p className="price">Rs. {product.price}</p>
 
-        <button className="primary" onClick={handleAdd} disabled={adding}>
-          {adding ? (
-            <span className="btn-loading">
-              <span className="spinner" /> Adding...
-            </span>
-          ) : (
-            "Add to Cart"
+          <label>
+            Delivery Pincode
+            <input value={pincode} onChange={(event) => setPincode(event.target.value)} />
+          </label>
+          {pincode && (
+            <div className="delivery-options">
+              <button className="ghost">Tomorrow</button>
+              <button className="ghost">Later</button>
+            </div>
           )}
-        </button>
 
-        <div className="addons">
-          <h4>Add-ons</h4>
-          {addons.map((addon) => (
-            <label key={addon.id} className="addon-item">
-              <input
-                type="checkbox"
-                checked={!!selectedAddons.find((item) => item.id === addon.id)}
-                onChange={() => toggleAddon(addon)}
-              />
-              {addon.name} - Rs. {addon.price}
-            </label>
-          ))}
+          <button className="primary" onClick={handleAdd} disabled={adding}>
+            {adding ? (
+              <span className="btn-loading">
+                <span className="spinner" /> Adding...
+              </span>
+            ) : (
+              "Add to Cart"
+            )}
+          </button>
+
+          <div className="addons">
+            <h4>Add-ons</h4>
+            {addons.map((addon) => (
+              <label key={addon.id} className="addon-item">
+                <input
+                  type="checkbox"
+                  checked={!!selectedAddons.find((item) => item.id === addon.id)}
+                  onChange={() => toggleAddon(addon)}
+                />
+                {addon.name} - Rs. {addon.price}
+              </label>
+            ))}
+          </div>
         </div>
       </div>
     </div>
