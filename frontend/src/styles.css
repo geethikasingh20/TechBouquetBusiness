@@ -1908,3 +1908,25 @@ body {
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(20deg); }
 }
+
+.grid {
+  align-items: stretch;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-card button,
+.product-card .primary {
+  margin-top: auto;
+}
+
+
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+  justify-content: flex-start;
+}
+
