@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: techbouquet-backend
+    env: java
+    rootDir: backend
+    buildCommand: mvn -DskipTests package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: SENDGRID_FROM_NAME
+        sync: false
+      - key: VERIFY_EMAIL_URL_BASE
+        sync: false
+      - key: EMAIL_LOGO_URL
+        sync: false
+      - key: EMAIL_BG_URL
+        sync: false
+
+  - type: static
+    name: techbouquet-frontend
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    publishDir: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE
+        sync: false

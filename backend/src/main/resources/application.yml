@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   config:
@@ -8,9 +8,9 @@ spring:
     # url: jdbc:postgresql://localhost:5432/techbouquet
     # username: postgres
     # password: postgres
-    url: jdbc:postgresql://dpg-d6u1oqea2pns739463c0-a.oregon-postgres.render.com:5432/techbouquet_gpt_db?sslmode=require
-    username: techbouquet_gpt_db_user
-    password: utsi1lNtonBIAj7UNHbJCuA6J4zKKC01
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/techbouquet}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,7 +26,7 @@ logging:
 app:
   jwt:
     issuer: techbouquet
-    secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+    secret: ${JWT_SECRET:CHANGE_ME_TO_A_LONG_RANDOM_SECRET}
     ttlMinutes: 1440
   email:
     verifyUrlBase: ${VERIFY_EMAIL_URL_BASE:http://localhost:8080/api/auth/verify-email?token=}
