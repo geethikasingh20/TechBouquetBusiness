@@ -50,7 +50,9 @@ export default function CartPage() {
     <div className="page cart-page">
       <h2>Your Cart</h2>
       {loading && items.length === 0 ? (
-        <p>Loading your cart...</p>
+        <div className="page-spinner">
+          <span className="spinner" />
+        </div>
       ) : items.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (

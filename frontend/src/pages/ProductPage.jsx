@@ -53,7 +53,13 @@ export default function ProductPage() {
   };
 
   if (loading) {
-    return <div className="page">Loading product...</div>;
+    return (
+      <div className="page">
+        <div className="page-spinner">
+          <span className="spinner" />
+        </div>
+      </div>
+    );
   }
 
   if (!product) {
