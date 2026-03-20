@@ -114,7 +114,16 @@ export default function RegisterPage() {
           {fieldErrors.phone && <span className="field-error">{fieldErrors.phone}</span>}
         </label>
         <label className="password-field">
-          Password
+          <span className="password-label">
+            Password
+            <span
+              className="hint-icon"
+              data-tooltip="Use 8+ chars with uppercase, lowercase, number, and special character."
+              aria-label="Password rules"
+            >
+              i
+            </span>
+          </span>
           <input
             type={showPassword ? "text" : "password"}
             name="password"
@@ -126,7 +135,6 @@ export default function RegisterPage() {
           <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
             {showPassword ? "Hide" : "Show"}
           </button>
-          <span className="field-hint">Use 8+ chars with uppercase, lowercase, number, and special character.</span>
           {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
         </label>
         <button className="primary" type="submit">Register</button>
