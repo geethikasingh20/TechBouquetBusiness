@@ -60,6 +60,7 @@ export default function Header() {
   };
 
   const displayName = user?.name ? user.name : "Guest";
+  const profileLink = user ? "/profile" : "/login";
 
   return (
     <header className="site-header">
@@ -91,7 +92,7 @@ export default function Header() {
         <Link to="/cart" className="icon-button">
           Tokri ({totalQuantity})
         </Link>
-        <Link to="/profile" className="icon-button profile-link">
+        <Link to={profileLink} className="icon-button profile-link">
           <span className="profile-avatar" aria-hidden="true">
             <svg viewBox="0 0 64 64" aria-hidden="true">
               <circle cx="32" cy="22" r="12" />

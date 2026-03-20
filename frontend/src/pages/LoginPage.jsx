@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginApi, verifyEmailApi } from "../data/api";
@@ -9,6 +9,12 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.token) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });

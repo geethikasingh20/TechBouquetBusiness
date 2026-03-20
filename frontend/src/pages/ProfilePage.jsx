@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const sections = [
@@ -12,7 +13,14 @@ const sections = [
 
 export default function ProfilePage() {
   const [active, setActive] = useState(sections[0]);
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user?.token) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="page profile-page">
