@@ -1348,3 +1348,31 @@ body {
   color: #c9a46a;
 }
 
+
+.category-item:hover,
+.category-item:focus-within {
+  border: 1px solid #c9a46a;
+  color: #c9a46a;
+}
+
+.category-item:hover .category-dropdown,
+.category-item:focus-within .category-dropdown {
+  border-color: #c9a46a;
+}
+
+.category-dropdown span:hover {
+  color: #c9a46a;
+}
+
+
+.category-item:hover,
+.category-item:focus-within {
+  background: rgba(201, 164, 106, 0.15);
+}
+
+
+.category-dropdown {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+}
+
