@@ -6,6 +6,7 @@ import { registerApi } from "../data/api";
 const NAME_REGEX = /^[A-Za-z\s]+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[6-9]\d{9}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +51,10 @@ export default function RegisterPage() {
     }
 
     if (!form.password.trim()) errors.password = "Password is required.";
+    if (form.password.trim() && !PASSWORD_REGEX.test(form.password)) {
+      errors.password = "Password must be 8+ chars with uppercase, lowercase, number, and special character.";
+    }
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -116,10 +121,12 @@ export default function RegisterPage() {
             value={form.password}
             onChange={handleChange}
             required
+            title="8+ chars with uppercase, lowercase, number, and special character"
           />
           <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
             {showPassword ? "Hide" : "Show"}
           </button>
+          <span className="field-hint">Use 8+ chars with uppercase, lowercase, number, and special character.</span>
           {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
         </label>
         <button className="primary" type="submit">Register</button>
