@@ -8,6 +8,7 @@ export default function Header() {
   const { items } = useCart();
   const { user, logout } = useAuth();
   const [location, setLocation] = useState({ city: "", state: "", pincode: "" });
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   const totalQuantity = useMemo(() => {
@@ -51,7 +52,11 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    setLoggingOut(true);
+    setTimeout(() => {
+      logout();
+      setLoggingOut(false);
+    }, 800);
   };
 
   const displayName = user?.name ? user.name : "Guest";
@@ -69,14 +74,19 @@ export default function Header() {
       </div>
       <SearchBar />
       <div className="header-actions">
-        {!user && (
+        {!user && !loggingOut && (
           <>
             <button className="ghost" onClick={() => navigate("/login")}>Login</button>
             <button className="primary" onClick={() => navigate("/register")}>Register</button>
           </>
         )}
         {user && (
-          <button className="ghost" onClick={handleLogout}>Logout</button>
+          <button className="ghost" onClick={handleLogout} disabled={loggingOut}>
+            {loggingOut ? "Logging out..." : "Logout"}
+          </button>
+        )}
+        {loggingOut && !user && (
+          <span className="logout-status">Logged out</span>
         )}
         <Link to="/cart" className="icon-button">
           Tokri ({totalQuantity})
