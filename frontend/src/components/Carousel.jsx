@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import slide1 from "../assets/carousel1.png";
 import slide2 from "../assets/carousel2.jpg";
 
-const slides = [slide1, slide2];
+const slides = [slide2,slide1];
 
 export default function Carousel() {
   const [index, setIndex] = useState(0);

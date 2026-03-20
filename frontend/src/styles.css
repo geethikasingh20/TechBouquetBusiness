@@ -1376,3 +1376,25 @@ body {
   backdrop-filter: blur(6px);
 }
 
+
+.category-dropdown span {
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.category-dropdown span:hover {
+  background: rgba(201, 164, 106, 0.2);
+}
+
+
+.category-item {
+  padding-bottom: 12px;
+}
+
+.category-dropdown {
+  margin-top: 0;
+  top: calc(100% - 2px);
+  pointer-events: auto;
+}
+
