@@ -6,6 +6,7 @@ import com.techbouquet.auth.dto.RegisterRequest;
 import com.techbouquet.config.JwtService;
 import com.techbouquet.customer.Customer;
 import com.techbouquet.customer.CustomerRepository;
+import com.techbouquet.email.SendGridEmailService;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +22,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final SendGridEmailService emailService;
 
     public AuthService(CustomerRepository customerRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       SendGridEmailService emailService) {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
 
     public AuthResponse register(RegisterRequest request, String ipAddress) {
@@ -48,6 +52,11 @@ public class AuthService {
 
         Customer saved = customerRepository.save(customer);
         log.info("Registered user id={} email={}", saved.getId(), saved.getEmail());
+        try {
+            emailService.sendWelcomeEmail(saved.getEmail(), saved.getName());
+        } catch (Exception ex) {
+            log.warn("Welcome email failed for {}", saved.getEmail(), ex);
+        }
         String token = jwtService.generateToken(saved.getEmail());
         return new AuthResponse(token, saved.getName(), saved.isEmailVerified());
     }

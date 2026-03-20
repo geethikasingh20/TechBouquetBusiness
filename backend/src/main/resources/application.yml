@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: optional:file:backend/.env[.properties],optional:file:.env[.properties]
   datasource:
     # url: jdbc:postgresql://localhost:5432/techbouquet
     # username: postgres
@@ -26,3 +28,8 @@ app:
     issuer: techbouquet
     secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
     ttlMinutes: 1440
+  email:
+    sendgrid:
+      apiKey: ${SENDGRID_API_KEY:}
+      fromEmail: ${SENDGRID_FROM_EMAIL:}
+      fromName: ${SENDGRID_FROM_NAME:Velvet Petals}
