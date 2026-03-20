@@ -86,7 +86,9 @@ export default function CategoryPage() {
 
       {loading ? (
         <div className="page-spinner">
-          <span className="spinner" />
+          <div className="brand-spinner">
+            <span className="spinner-petal" />
+          </div>
         </div>
       ) : (
         <div className="grid">

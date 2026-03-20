@@ -1864,3 +1864,47 @@ body {
   height: 14px;
   border-width: 2px;
 }
+.brand-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner-petal,
+.spinner-bloom,
+.spinner-leaf {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.spinner-petal {
+  border: 3px solid rgba(201, 164, 106, 0.25);
+  border-top-color: #c9a46a;
+  animation: spin 0.9s linear infinite;
+}
+
+.spinner-bloom {
+  background: radial-gradient(circle, rgba(201, 164, 106, 0.6) 0 45%, rgba(201, 164, 106, 0.1) 55% 100%);
+  animation: bloom 1.2s ease-in-out infinite;
+}
+
+.spinner-leaf {
+  border: 2px solid rgba(201, 164, 106, 0.25);
+  border-left-color: #c9a46a;
+  border-right-color: #c9a46a;
+  border-radius: 12px 12px 12px 12px;
+  animation: leaf 1s ease-in-out infinite;
+}
+
+@keyframes bloom {
+  0%, 100% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes leaf {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+}

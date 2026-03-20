@@ -56,7 +56,9 @@ export default function ProductPage() {
     return (
       <div className="page">
         <div className="page-spinner">
-          <span className="spinner" />
+          <div className="brand-spinner">
+            <span className="spinner-petal" />
+          </div>
         </div>
       </div>
     );
