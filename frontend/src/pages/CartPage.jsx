@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 export default function CartPage() {
@@ -40,18 +41,33 @@ export default function CartPage() {
         <p>Your cart is empty.</p>
       ) : (
         <div className="cart-list">
+          <div className="cart-header">
+            <span>Image</span>
+            <span>Item</span>
+            <span>Price</span>
+            <span>Quantity</span>
+            <span>Total</span>
+            <span></span>
+          </div>
           {items.map((item) => (
-            <div key={item.id} className="cart-item">
-              <div>
-                <h4>{item.name}</h4>
-                <p>Rs. {item.price}</p>
+            <div key={item.id} className="cart-row">
+              <div className="cart-col">
+                <Link to={`/product/${item.productId}`} className="cart-link" target="_blank" rel="noreferrer">
+                  <img className="cart-thumb" src={item.imageUrl} alt={item.name} />
+                </Link>
+              </div>
+              <div className="cart-col item-col">
+                <Link className="cart-link" to={`/product/${item.productId}`} target="_blank" rel="noreferrer">
+                  {item.name}
+                </Link>
                 {item.addons?.length > 0 && (
                   <p className="addons-line">
                     Add-ons: {item.addons.map((addon) => addon.name).join(", ")}
                   </p>
                 )}
               </div>
-              <div className="cart-actions">
+              <div className="cart-col">Rs. {item.price}</div>
+              <div className="cart-col qty-col">
                 <div className="qty-control">
                   <button
                     type="button"
@@ -78,16 +94,17 @@ export default function CartPage() {
                   </button>
                   {pending[item.id] && <span className="spinner small" />}
                 </div>
-                <p>Total: Rs. {item.price * item.quantity}</p>
-                <button className="ghost" onClick={() => removeItem(item.id)} disabled={pending[item.id]}>
+                <button className="ghost remove-btn" onClick={() => removeItem(item.id)} disabled={pending[item.id]}>
                   Remove
                 </button>
               </div>
+              <div className="cart-col">Rs. {item.price * item.quantity}</div>
+              <div className="cart-col"></div>
             </div>
           ))}
           <div className="cart-summary">
-            <strong>Grand Total: Rs. {total}</strong>
             <button className="ghost" onClick={clearCart}>Clear Cart</button>
+            <strong>Order Total: Rs. {total}</strong>
           </div>
         </div>
       )}

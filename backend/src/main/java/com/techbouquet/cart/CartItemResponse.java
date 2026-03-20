@@ -9,14 +9,16 @@ public class CartItemResponse {
     private int price;
     private int quantity;
     private List<CartAddon> addons;
+    private String imageUrl;
 
-    public CartItemResponse(Long id, Long productId, String name, int price, int quantity, List<CartAddon> addons) {
+    public CartItemResponse(Long id, Long productId, String name, int price, int quantity, List<CartAddon> addons, String imageUrl) {
         this.id = id;
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.addons = addons;
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
@@ -41,5 +43,9 @@ public class CartItemResponse {
 
     public List<CartAddon> getAddons() {
         return addons;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 }

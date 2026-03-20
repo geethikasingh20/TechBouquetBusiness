@@ -111,13 +111,17 @@ public class CartController {
         for (CartItem item : items) {
             List<CartAddon> addons = parseAddons(item.getAddonsJson());
             int price = item.getProduct().getPrice().intValue();
+            String imageUrl = item.getProduct().getImages().isEmpty()
+                    ? null
+                    : item.getProduct().getImages().get(0).getUrl();
             responses.add(new CartItemResponse(
                     item.getId(),
                     item.getProduct().getId(),
                     item.getProduct().getName(),
                     price,
                     item.getQuantity(),
-                    addons
+                    addons,
+                    imageUrl
             ));
         }
         return responses;
