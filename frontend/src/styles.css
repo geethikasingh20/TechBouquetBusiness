@@ -1123,3 +1123,21 @@ body {
   display: block;
 }
 
+
+.auth-switch {
+  margin-top: 16px;
+  font-size: 13px;
+  text-align: center;
+  color: #374151;
+}
+
+.auth-switch a {
+  color: #f15f3f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+

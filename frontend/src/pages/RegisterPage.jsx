@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { registerApi } from "../data/api";
 
@@ -157,6 +157,9 @@ export default function RegisterPage() {
         </label>
         <button className="primary" type="submit">Register</button>
       </form>
+      <p className="auth-switch">
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
     </div>
   );
 }

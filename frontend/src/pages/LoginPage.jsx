@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginApi, verifyEmailApi } from "../data/api";
 
@@ -57,6 +57,10 @@ export default function LoginPage() {
         </label>
         <button className="primary" type="submit">Login</button>
       </form>
+
+      <p className="auth-switch">
+        New here? <Link to="/register">Create an account</Link>
+      </p>
 
       <div className="reset-box">
         <h4>Forgot your password?</h4>
