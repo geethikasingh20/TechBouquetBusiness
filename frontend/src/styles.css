@@ -1324,3 +1324,27 @@ body {
   background-size: 100px 100px;
   opacity: 0.55;
 }
+
+.auth-form label {
+  color: #b8894b;
+}
+
+
+.auth-form label {
+  color: #c9a46a;
+}
+
+
+.auth-form .primary {
+  background: linear-gradient(135deg, #c9a46a 0%, #b8894b 100%);
+}
+
+.ghost {
+  border-color: #c9a46a;
+  color: #c9a46a;
+}
+
+.auth-switch a {
+  color: #c9a46a;
+}
+
