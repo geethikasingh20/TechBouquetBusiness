@@ -1311,3 +1311,16 @@ body {
   background-size: 120px 120px;
   opacity: 0.35;
 }
+.auth-page h2::after {
+  height: 3px;
+  width: 130px;
+}
+
+.auth-page::after {
+  background-image: radial-gradient(circle at 20% 30%, rgba(180, 140, 90, 0.22) 0 3px, transparent 3px),
+                    radial-gradient(circle at 70% 40%, rgba(180, 140, 90, 0.22) 0 3px, transparent 3px),
+                    radial-gradient(circle at 40% 70%, rgba(180, 140, 90, 0.22) 0 3px, transparent 3px),
+                    radial-gradient(circle at 60% 20%, rgba(180, 140, 90, 0.2) 0 2px, transparent 2px);
+  background-size: 100px 100px;
+  opacity: 0.55;
+}
