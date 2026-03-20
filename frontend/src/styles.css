@@ -526,3 +526,31 @@ main {
 .cart-link:hover {
   color: #f15f3f;
 }
+.category-item {
+  position: relative;
+  z-index: 3;
+}
+
+.category-dropdown {
+  z-index: 4;
+}
+
+.carousel {
+  z-index: 1;
+}
+.category-item {
+  position: relative;
+}
+
+.category-item:hover .category-dropdown,
+.category-item:focus-within .category-dropdown {
+  display: flex;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  min-width: 180px;
+}
