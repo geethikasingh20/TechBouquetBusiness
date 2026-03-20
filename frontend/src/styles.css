@@ -554,3 +554,21 @@ main {
   margin-top: 6px;
   min-width: 180px;
 }
+.location-block {
+  display: grid;
+  gap: 2px;
+  font-size: 12px;
+  color: #4a2c1d;
+}
+
+.location-block .deliver {
+  font-weight: 600;
+}
+
+.location-block .city {
+  font-size: 12px;
+}
+
+.site-header {
+  min-height: 84px;
+}

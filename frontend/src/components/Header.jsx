@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Header() {
   const { items } = useCart();
   const { user, logout } = useAuth();
-  const [location, setLocation] = useState("Detecting...");
+  const [location, setLocation] = useState({ city: "", state: "", pincode: "" });
   const navigate = useNavigate();
 
   const totalQuantity = useMemo(() => {
@@ -15,13 +15,38 @@ export default function Header() {
   }, [items]);
 
   useEffect(() => {
+    const fallback = { city: "Bengaluru", state: "Karnataka", pincode: "" };
     if (!navigator.geolocation) {
-      setLocation("Bengaluru");
+      setLocation(fallback);
       return;
     }
+
     navigator.geolocation.getCurrentPosition(
-      () => setLocation("Bengaluru"),
-      () => setLocation("Bengaluru")
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`
+          );
+          const data = await response.json();
+          const address = data?.address || {};
+          const city = address.city || address.town || address.village || address.county || "";
+          const state = address.state || "";
+          const pincode = address.postcode || address.postalcode || address.zip || "";
+          if (city || state || pincode) {
+            setLocation({
+              city: city || fallback.city,
+              state: state || fallback.state,
+              pincode
+            });
+          } else {
+            setLocation(fallback);
+          }
+        } catch (error) {
+          setLocation(fallback);
+        }
+      },
+      () => setLocation(fallback)
     );
   }, []);
 
@@ -33,7 +58,12 @@ export default function Header() {
     <header className="site-header">
       <div className="header-left">
         <Link to="/" className="logo">TechBouquet</Link>
-        <span className="location">{location}</span>
+        <div className="location-block">
+          <span className="deliver">Deliver to {location.state || ""}</span>
+          <span className="city">
+            {location.city || ""}{location.pincode ? ` - ${location.pincode}` : ""}
+          </span>
+        </div>
       </div>
       <SearchBar />
       <div className="header-actions">
