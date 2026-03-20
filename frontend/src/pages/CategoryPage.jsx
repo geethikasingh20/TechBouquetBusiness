@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, useParams } from "react-router-dom";
+import { Link, useSearchParams, useParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import { fetchProductsCached } from "../data/api";
 
@@ -43,6 +43,18 @@ export default function CategoryPage() {
 
   return (
     <div className="page category-page">
+      <nav className="breadcrumbs">
+        <Link to="/">Home</Link>
+        <span>/</span>
+        <Link to={`/category/${encodeURIComponent(categoryName)}`}>{categoryName}</Link>
+        {sub && (
+          <>
+            <span>/</span>
+            <Link to={`/category/${encodeURIComponent(categoryName)}?sub=${encodeURIComponent(sub)}`}>{sub}</Link>
+          </>
+        )}
+      </nav>
+
       <header className="page-hero">
         <h2 className="page-title">{categoryName}</h2>
         <p className="page-subtitle">Explore curated {categoryName.toLowerCase()} for every occasion.</p>

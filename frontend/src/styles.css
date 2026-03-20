@@ -1550,3 +1550,28 @@ body {
   background: rgba(201, 164, 106, 0.12);
 }
 
+
+.breadcrumbs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.breadcrumbs a {
+  text-decoration: none;
+  color: #6b7280;
+}
+
+.breadcrumbs a:hover {
+  color: #c9a46a;
+}
+
+
+.product-page .breadcrumbs {
+  grid-column: 1 / -1;
+  margin-bottom: -6px;
+}
+

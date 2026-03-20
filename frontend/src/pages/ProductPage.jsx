@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { fetchProductById } from "../data/api";
 import { addons } from "../data/products";
 import { useCart } from "../context/CartContext";
@@ -60,8 +60,31 @@ export default function ProductPage() {
     return <div className="page">Product not found.</div>;
   }
 
+  const categoryName = product.category || "";
+  const subcategoryName = product.subcategory || "";
+
   return (
     <div className="page product-page">
+      <nav className="breadcrumbs">
+        <Link to="/">Home</Link>
+        {categoryName && (
+          <>
+            <span>/</span>
+            <Link to={`/category/${encodeURIComponent(categoryName)}`}>{categoryName}</Link>
+          </>
+        )}
+        {subcategoryName && (
+          <>
+            <span>/</span>
+            <Link to={`/category/${encodeURIComponent(categoryName)}?sub=${encodeURIComponent(subcategoryName)}`}>
+              {subcategoryName}
+            </Link>
+          </>
+        )}
+        <span>/</span>
+        <span>{product.name}</span>
+      </nav>
+
       <div className="product-gallery">
         <img src={selectedImage} alt={product.name} className="main-image" />
         <div className="thumbnail-row">
