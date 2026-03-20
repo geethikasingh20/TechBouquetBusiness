@@ -659,3 +659,39 @@ main {
   border-radius: 10px;
   background: #fff;
 }
+
+.profile-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: auto;
+}
+
+.profile-link:hover {
+  background: transparent;
+}
+
+
+.profile-avatar {
+  background: transparent;
+}
+
+.profile-avatar img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+}
+
+.profile-avatar img {
+  width: 40px;
+  height: 40px;
+}
+

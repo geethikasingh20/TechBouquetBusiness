@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import avatarImage from "../assets/avtar.png";
 
 export default function Header() {
   const { items } = useCart();
@@ -76,10 +77,7 @@ export default function Header() {
       <SearchBar />
       <div className="header-actions">
         {!user && !loggingOut && (
-          <>
-            <button className="ghost" onClick={() => navigate("/login")}>Login</button>
-            <button className="primary" onClick={() => navigate("/register")}>Register</button>
-          </>
+          <button className="primary" onClick={() => navigate("/register")}>Register</button>
         )}
         {user && (
           <button className="ghost" onClick={handleLogout} disabled={loggingOut}>
@@ -94,10 +92,7 @@ export default function Header() {
         </Link>
         <Link to={profileLink} className="icon-button profile-link">
           <span className="profile-avatar" aria-hidden="true">
-            <svg viewBox="0 0 64 64" aria-hidden="true">
-              <circle cx="32" cy="22" r="12" />
-              <path d="M12 56c3-12 14-18 20-18s17 6 20 18" />
-            </svg>
+            <img src={avatarImage} alt="User" />
           </span>
           <span className="welcome-text">Welcome {displayName}</span>
         </Link>
