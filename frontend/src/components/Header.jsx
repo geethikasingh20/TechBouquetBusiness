@@ -65,6 +65,9 @@ export default function Header() {
 
   return (
     <header className="site-header">
+      <button className="icon-button menu-button" type="button" aria-label="Menu">
+        <span className="menu-lines"></span>
+      </button>
       <div className="header-left">
         <Link to="/" className="logo">TechBouquet</Link>
         <div className="location-block">
@@ -96,9 +99,6 @@ export default function Header() {
           </span>
           <span className="welcome-text">Welcome {displayName}</span>
         </Link>
-        <button className="icon-button menu-button" type="button" aria-label="Menu">
-          <span className="menu-lines"></span>
-        </button>
       </div>
     </header>
   );
