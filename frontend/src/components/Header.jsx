@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import avatarImage from "../assets/avtar.png";
 import logoImage from "../assets/logoImage.png";
+import tokriImage from "../assets/tokri.png";
 
 export default function Header() {
   const { items } = useCart();
@@ -93,14 +94,15 @@ export default function Header() {
         {loggingOut && !user && (
           <span className="logout-status">Logged out</span>
         )}
-        <Link to="/cart" className="icon-button">
-          Tokri ({totalQuantity})
-        </Link>
         <Link to={profileLink} className="icon-button profile-link">
           <span className="profile-avatar" aria-hidden="true">
             <img src={avatarImage} alt="User" />
           </span>
           <span className="welcome-text">Welcome {displayName}</span>
+        </Link>
+        <Link to="/cart" className="icon-button tokri-button" aria-label="Cart">
+          <img src={tokriImage} alt="Tokri" className="tokri-icon" />
+          <span className="tokri-count">{totalQuantity}</span>
         </Link>
       </div>
     </header>
