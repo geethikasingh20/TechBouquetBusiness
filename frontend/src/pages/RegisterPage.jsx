@@ -120,6 +120,7 @@ export default function RegisterPage() {
               className="hint-icon"
               data-tooltip="Use 8+ chars with uppercase, lowercase, number, and special character."
               aria-label="Password rules"
+              tabIndex={0}
             >
               i
             </span>

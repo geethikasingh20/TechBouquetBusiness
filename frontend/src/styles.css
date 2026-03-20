@@ -998,3 +998,17 @@ body {
   opacity: 1;
 }
 
+
+.hint-icon:focus::after,
+.hint-icon:focus::before {
+  opacity: 1;
+}
+
+.hint-icon {
+  outline: none;
+}
+
+.hint-icon:focus {
+  box-shadow: 0 0 0 2px #9ca3af;
+}
+
