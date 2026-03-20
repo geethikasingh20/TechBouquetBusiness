@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Carousel from "../components/Carousel";
 import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
-import { fetchProducts } from "../data/api";
+import { fetchProductsCached } from "../data/api";
 
 const bouquetBestsellers = [
   "Sunrise Rose Bouquet",
@@ -25,8 +25,8 @@ export default function HomePage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchProducts();
-        setProducts(data);
+        const { items } = await fetchProductsCached();
+        setProducts(items);
       } catch (error) {
         setProducts([]);
       } finally {

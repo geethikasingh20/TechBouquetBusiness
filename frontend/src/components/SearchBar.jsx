@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchProducts } from "../data/api";
+import { fetchProductsCached } from "../data/api";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -10,8 +10,8 @@ export default function SearchBar() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await fetchProducts();
-        setProducts(data);
+        const { items } = await fetchProductsCached();
+        setProducts(items);
       } catch (error) {
         setProducts([]);
       }

@@ -1,4 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "";
+const PRODUCTS_CACHE_KEY = "techbouquet_products_cache";
+const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
 
 export async function apiFetch(path, options = {}) {
   const { headers = {}, ...rest } = options;
@@ -52,6 +54,31 @@ export async function fetchProfile(token) {
 
 export async function fetchProducts() {
   return apiFetch("/api/products");
+}
+
+export function readProductsCache() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.items || !parsed?.ts) return null;
+    if (Date.now() - parsed.ts > PRODUCTS_CACHE_TTL_MS) return null;
+    return parsed.items;
+  } catch {
+    return null;
+  }
+}
+
+export function writeProductsCache(items) {
+  localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+}
+
+export async function fetchProductsCached() {
+  const cached = readProductsCache();
+  if (cached) return { items: cached, cached: true };
+  const items = await fetchProducts();
+  writeProductsCache(items);
+  return { items, cached: false };
 }
 
 export async function fetchProductById(id) {
