@@ -572,3 +572,82 @@ main {
 .site-header {
   min-height: 84px;
 }
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.human-icon {
+  font-size: 16px;
+}
+
+.menu-button {
+  font-size: 18px;
+  padding: 6px 10px;
+}
+.profile-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff2e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.welcome-text {
+  font-size: 11px;
+  line-height: 1.1;
+}
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff2e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #4a2c1d;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-lines {
+  width: 18px;
+  height: 12px;
+  display: inline-block;
+  background: linear-gradient(
+    to bottom,
+    #4a2c1d 0,
+    #4a2c1d 2px,
+    transparent 2px,
+    transparent 5px,
+    #4a2c1d 5px,
+    #4a2c1d 7px,
+    transparent 7px,
+    transparent 10px,
+    #4a2c1d 10px,
+    #4a2c1d 12px
+  );
+}

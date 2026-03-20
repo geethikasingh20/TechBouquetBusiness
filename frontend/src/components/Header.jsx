@@ -54,6 +54,8 @@ export default function Header() {
     logout();
   };
 
+  const displayName = user?.name ? user.name : "Guest";
+
   return (
     <header className="site-header">
       <div className="header-left">
@@ -74,23 +76,23 @@ export default function Header() {
           </>
         )}
         {user && (
-          <>
-            <span className="welcome">Welcome {user.name}</span>
-            {!user.emailVerified && (
-              <button className="ghost" onClick={() => navigate("/login")}>Verify Email</button>
-            )}
-            <button className="ghost" onClick={handleLogout}>Logout</button>
-          </>
+          <button className="ghost" onClick={handleLogout}>Logout</button>
         )}
         <Link to="/cart" className="icon-button">
           Tokri ({totalQuantity})
         </Link>
-        {user && (
-          <>
-            <button className="icon-button" type="button">Menu</button>
-            <Link to="/profile" className="icon-button">Profile</Link>
-          </>
-        )}
+        <Link to="/profile" className="icon-button profile-link">
+          <span className="profile-avatar" aria-hidden="true">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="22" r="12" />
+              <path d="M12 56c3-12 14-18 20-18s17 6 20 18" />
+            </svg>
+          </span>
+          <span className="welcome-text">Welcome {displayName}</span>
+        </Link>
+        <button className="icon-button menu-button" type="button" aria-label="Menu">
+          <span className="menu-lines"></span>
+        </button>
       </div>
     </header>
   );
