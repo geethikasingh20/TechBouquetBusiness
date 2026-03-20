@@ -3,6 +3,7 @@ import { addCartItem, clearCartApi, fetchCart, removeCartItem, updateCartItem } 
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
+const CART_CACHE_KEY = "techbouquet_cart_cache";
 
 function normalizeAddons(value) {
   return Array.isArray(value) ? value : [];
@@ -14,6 +15,29 @@ function sameAddons(a, b) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function readCache(email) {
+  try {
+    const raw = localStorage.getItem(CART_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.email === email && Array.isArray(parsed.items)) {
+      return parsed.items;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function writeCache(email, items) {
+  if (!email) return;
+  localStorage.setItem(CART_CACHE_KEY, JSON.stringify({ email, items }));
+}
+
+function clearCache() {
+  localStorage.removeItem(CART_CACHE_KEY);
+}
+
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -23,14 +47,22 @@ export function CartProvider({ children }) {
     const loadCart = async () => {
       if (!user?.token) {
         setItems([]);
+        clearCache();
         return;
       }
+
+      const cached = readCache(user.email);
+      if (cached) {
+        setItems(cached);
+      }
+
       setLoading(true);
       try {
         const data = await fetchCart(user.token);
         setItems(data);
+        writeCache(user.email, data);
       } catch (error) {
-        // Keep existing items to avoid UI flicker
+        // Keep cached items to avoid UI flicker
       } finally {
         setLoading(false);
       }
@@ -51,11 +83,13 @@ export function CartProvider({ children }) {
         (item) => item.productId === product.id && sameAddons(item.addons, safeAddons)
       );
       if (existing) {
-        return prev.map((item) =>
+        const updated = prev.map((item) =>
           item === existing ? { ...item, quantity: item.quantity + 1 } : item
         );
+        writeCache(user.email, updated);
+        return updated;
       }
-      return [
+      const updated = [
         ...prev,
         {
           id: `tmp-${Date.now()}`,
@@ -66,6 +100,8 @@ export function CartProvider({ children }) {
           addons: safeAddons
         }
       ];
+      writeCache(user.email, updated);
+      return updated;
     });
 
     try {
@@ -74,46 +110,63 @@ export function CartProvider({ children }) {
         addonsJson: JSON.stringify(safeAddons)
       });
       setItems(data);
+      writeCache(user.email, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
+      writeCache(user.email, data);
       return;
     }
   };
 
   const updateQuantity = async (id, quantity) => {
     if (!user?.token) return;
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)));
+    setItems((prev) => {
+      const updated = prev.map((item) => (item.id === id ? { ...item, quantity } : item));
+      writeCache(user.email, updated);
+      return updated;
+    });
     try {
       const data = await updateCartItem(user.token, id, quantity);
       setItems(data);
+      writeCache(user.email, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
+      writeCache(user.email, data);
     }
   };
 
   const removeItem = async (id) => {
     if (!user?.token) return;
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    setItems((prev) => {
+      const updated = prev.filter((item) => item.id !== id);
+      writeCache(user.email, updated);
+      return updated;
+    });
     try {
       const data = await removeCartItem(user.token, id);
       setItems(data);
+      writeCache(user.email, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
+      writeCache(user.email, data);
     }
   };
 
   const clearCart = async () => {
     if (!user?.token) return;
     setItems([]);
+    writeCache(user.email, []);
     try {
       const data = await clearCartApi(user.token);
       setItems(data);
+      writeCache(user.email, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
+      writeCache(user.email, data);
     }
   };
 
