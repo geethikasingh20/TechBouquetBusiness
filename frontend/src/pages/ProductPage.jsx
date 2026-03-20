@@ -119,6 +119,7 @@ export default function ProductPage() {
           </div>
           <p className="price">Rs. {product.price}</p>
 
+          {/*TODO:
           <label>
             Delivery Pincode
             <input value={pincode} onChange={(event) => setPincode(event.target.value)} />
@@ -129,7 +130,7 @@ export default function ProductPage() {
               <button className="ghost">Later</button>
             </div>
           )}
-
+          */}
           <button className="primary" onClick={handleAdd} disabled={adding}>
             {adding ? (
               <span className="btn-loading">
