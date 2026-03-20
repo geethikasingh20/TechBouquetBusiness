@@ -1669,3 +1669,21 @@ body {
   object-fit: contain;
 }
 
+
+.product-info h2 {
+  margin-bottom: 6px;
+}
+
+.flower-rating {
+  margin-top: -2px;
+}
+
+
+.product-info h2 {
+  margin-bottom: 2px;
+}
+
+.flower-rating {
+  margin-top: -6px;
+}
+
