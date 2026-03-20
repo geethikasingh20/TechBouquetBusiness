@@ -402,3 +402,13 @@ main {
   padding: 10px 14px;
   border-radius: 10px;
 }
+.qty-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-control input {
+  width: 70px;
+  text-align: center;
+}

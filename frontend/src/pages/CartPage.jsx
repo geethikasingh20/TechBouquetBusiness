@@ -15,14 +15,15 @@ export default function CartPage() {
   }, [items]);
 
   const scheduleUpdate = (id, value) => {
-    setLocalQty((prev) => ({ ...prev, [id]: value }));
+    const safeValue = Math.max(1, Number(value || 1));
+    setLocalQty((prev) => ({ ...prev, [id]: safeValue }));
     if (timersRef.current[id]) {
       clearTimeout(timersRef.current[id]);
     }
     timersRef.current[id] = setTimeout(() => {
-      updateQuantity(id, value);
+      updateQuantity(id, safeValue);
       delete timersRef.current[id];
-    }, 500);
+    }, 400);
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -48,12 +49,28 @@ export default function CartPage() {
                 )}
               </div>
               <div className="cart-actions">
-                <input
-                  type="number"
-                  min="1"
-                  value={localQty[item.id] ?? item.quantity}
-                  onChange={(event) => scheduleUpdate(item.id, Number(event.target.value))}
-                />
+                <div className="qty-control">
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={localQty[item.id] ?? item.quantity}
+                    onChange={(event) => scheduleUpdate(item.id, event.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="ghost"
+                    onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) + 1)}
+                  >
+                    +
+                  </button>
+                </div>
                 <p>Total: Rs. {item.price * item.quantity}</p>
                 <button className="ghost" onClick={() => removeItem(item.id)}>Remove</button>
               </div>
