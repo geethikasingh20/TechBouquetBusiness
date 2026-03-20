@@ -695,3 +695,115 @@ main {
   height: 40px;
 }
 
+
+.logo-image {
+  height: 56px;
+  width: auto;
+  display: block;
+}
+
+
+.logo-image {
+  height: 92px;
+   
+}
+
+
+.profile-avatar img {
+  width: 25px;
+  height: 25px;
+}
+
+.profile-link {
+  gap: 2px;
+}
+
+
+/* Professional white theme overrides */
+:root {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+body {
+  background: #ffffff;
+  color: #1f2937;
+}
+
+.site-header {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.site-footer {
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.icon-button {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.search-wrapper input,
+.auth-form input {
+  border-color: #e5e7eb;
+  background: #ffffff;
+}
+
+.suggestions {
+  border-color: #e5e7eb;
+  background: #ffffff;
+}
+
+.category-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.category-dropdown {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.marquee {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.marquee span {
+  background: #f9fafb;
+}
+
+.product-card,
+.cart-row,
+.reset-box,
+.welcome-box,
+.profile-content {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.profile-sidebar button {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.cart-header {
+  border-bottom-color: #e5e7eb;
+}
+
+.cart-thumb {
+  border-color: #e5e7eb;
+}
+
+.location-block {
+  color: #1f2937;
+}
+
+.logo,
+.site-footer a,
+.cart-link {
+  color: #1f2937;
+}
+

@@ -4,6 +4,7 @@ import SearchBar from "./SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import avatarImage from "../assets/avtar.png";
+import logoImage from "../assets/logoImage.png";
 
 export default function Header() {
   const { items } = useCart();
@@ -69,7 +70,9 @@ export default function Header() {
         <span className="menu-lines"></span>
       </button>
       <div className="header-left">
-        <Link to="/" className="logo">TechBouquet</Link>
+        <Link to="/" className="logo">
+          <img src={logoImage} alt="TechBouquet" className="logo-image" />
+        </Link>
         <div className="location-block">
           <span className="deliver">Deliver to {location.state || ""}</span>
           <span className="city">
