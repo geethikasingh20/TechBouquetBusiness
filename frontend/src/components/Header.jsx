@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import avatarImage from "../assets/avtar.png";
+import avatarImage from "../assets/avtar-yellow.avif";
 import logoImage from "../assets/logoImage.png";
 import tokriImage from "../assets/tokri.png";
 
