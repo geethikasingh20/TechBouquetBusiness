@@ -1,11 +1,10 @@
 services:
   - type: web
     name: techbouquet-backend
-    runtime: java
+    runtime: docker
     plan: free
     rootDir: backend
-    buildCommand: mvn -DskipTests package
-    startCommand: java -jar target/*.jar
+    dockerfilePath: Dockerfile
     envVars:
       - key: SPRING_DATASOURCE_URL
         sync: false
