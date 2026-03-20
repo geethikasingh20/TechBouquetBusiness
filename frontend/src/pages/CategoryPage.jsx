@@ -56,8 +56,10 @@ export default function CategoryPage() {
       </nav>
 
       <header className="page-hero">
-        <h2 className="page-title">{categoryName}</h2>
-        <p className="page-subtitle">Explore curated {categoryName.toLowerCase()} for every occasion.</p>
+        {/* Banner area for category/subcategory (currently disabled) */}
+        {/* <img src={bannerUrl} alt="Category banner" className="page-banner" /> */}
+         {/*<h2 className="page-title">{categoryName}</h2>*/}
+         {/*<p className="page-subtitle">Explore curated {categoryName.toLowerCase()} for every occasion.</p>*/}
       </header>
 
       {subs.length > 0 && (
