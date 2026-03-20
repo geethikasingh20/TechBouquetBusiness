@@ -1098,10 +1098,10 @@ body {
 }
 
 .category-bar {
-  margin-top: 8px;
-  margin-bottom: 16px;
-  padding: 0 8vw;
-}
+      margin-top: 4px;
+      margin-bottom: 2px;
+      padding: 0 8vw;
+    }
 
 
 .auth-header {
