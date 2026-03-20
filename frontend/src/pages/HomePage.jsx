@@ -4,22 +4,33 @@ import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
 import { fetchProductsCached } from "../data/api";
 
-const bouquetBestsellers = [
-  "Sunrise Rose Bouquet",
-  "Pastel Tulip Wrap",
-  "Orchid Bloom Box",
-  "Garden Fresh Mix"
-];
-
-const hamperBestsellers = [
-  "Celebration Gift Hamper",
-  "Festival Treat Box",
-  "Love & Light Hamper",
-  "Tea Time Basket"
-];
 
 export default function HomePage() {
-  const [products, setProducts] = useState([]);
+  const bestsellerCategories = ["Bouquets", "Plants", "Cakes", "Gift Hampers"];
+
+const buildBestsellers = (items) => {
+  const normalized = Array.isArray(items) ? items : [];
+  const picks = [];
+  bestsellerCategories.forEach((category) => {
+    const matches = normalized.filter((product) =>
+      (product.category || "").toLowerCase() === category.toLowerCase()
+    );
+    picks.push(...matches.slice(0, 2));
+  });
+
+  const remaining = normalized.filter((product) => !picks.some((p) => p.id === product.id));
+  picks.push(...remaining.slice(0, 8 - picks.length));
+
+  return picks.map((product) => ({
+    id: product.id,
+    name: product.name,
+    image: product.images?.[0]?.url || product.images?.[0],
+    link: `/product/${product.id}`
+  }));
+};
+
+const [products, setProducts] = useState([]);
+  const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +38,7 @@ export default function HomePage() {
       try {
         const { items } = await fetchProductsCached();
         setProducts(items);
+        setBestsellers(buildBestsellers(items));
       } catch (error) {
         setProducts([]);
       } finally {
@@ -40,8 +52,7 @@ export default function HomePage() {
     <div className="page">
       <Carousel />
 
-      <Marquee title="Bestsellers - Fresh Flower Bouquets" items={bouquetBestsellers} />
-      <Marquee title="Bestsellers - Gift Hampers" items={hamperBestsellers} />
+      <Marquee title="Bestsellers" items={bestsellers} />
 
       <section className="featured">
         <h3>Featured Products</h3>

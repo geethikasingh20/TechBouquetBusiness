@@ -1930,3 +1930,36 @@ body {
   justify-content: flex-start;
 }
 
+
+
+.marquee-track {
+  gap: 14px;
+  padding: 12px;
+}
+
+.marquee-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(201, 164, 106, 0.35);
+  border-radius: 999px;
+  text-decoration: none;
+  color: #1f2937;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  min-width: 180px;
+}
+
+.marquee-card img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.marquee-card span {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
