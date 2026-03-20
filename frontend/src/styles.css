@@ -1959,6 +1959,11 @@ body {
   flex-shrink: 0;
 }
 
+.marquee-card img {
+ width: 56px;
+  height: 56px;
+  border-radius: 12px;
+}
 .marquee-card span {
   font-weight: 600;
   font-size: 0.95rem;
