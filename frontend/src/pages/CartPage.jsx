@@ -17,8 +17,22 @@ export default function CartPage() {
   }, [items]);
 
   const scheduleUpdate = (id, value) => {
-    const safeValue = Math.max(1, Number(value || 1));
+    const numeric = Number(value || 0);
+    const safeValue = Number.isFinite(numeric) ? numeric : 0;
+
     setLocalQty((prev) => ({ ...prev, [id]: safeValue }));
+
+    if (safeValue <= 0) {
+      if (timersRef.current[id]) {
+        clearTimeout(timersRef.current[id]);
+      }
+      setPending((prev) => ({ ...prev, [id]: true }));
+      removeItem(id).finally(() => {
+        setPending((prev) => ({ ...prev, [id]: false }));
+      });
+      return;
+    }
+
     if (timersRef.current[id]) {
       clearTimeout(timersRef.current[id]);
     }
@@ -69,17 +83,19 @@ export default function CartPage() {
               <div className="cart-col">Rs. {item.price}</div>
               <div className="cart-col qty-col">
                 <div className="qty-control">
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
-                    disabled={pending[item.id]}
-                  >
-                    -
-                  </button>
+                  {(localQty[item.id] ?? item.quantity) > 0 && (
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
+                      disabled={pending[item.id]}
+                    >
+                      -
+                    </button>
+                  )}
                   <input
                     type="number"
-                    min="1"
+                    min="0"
                     value={localQty[item.id] ?? item.quantity}
                     onChange={(event) => scheduleUpdate(item.id, event.target.value)}
                     disabled={pending[item.id]}
@@ -94,9 +110,6 @@ export default function CartPage() {
                   </button>
                   {pending[item.id] && <span className="spinner small" />}
                 </div>
-                <button className="ghost remove-btn" onClick={() => removeItem(item.id)} disabled={pending[item.id]}>
-                  Remove
-                </button>
               </div>
               <div className="cart-col">Rs. {item.price * item.quantity}</div>
               <div className="cart-col"></div>
