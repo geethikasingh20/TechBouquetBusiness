@@ -812,3 +812,67 @@ body {
   height: 420px;
 }
 
+
+.carousel-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.carousel-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.carousel-dots .dot.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+
+.carousel {
+  background: #ffffff;
+}
+
+.carousel img {
+  object-fit: contain;
+  background: #ffffff;
+}
+
+
+.carousel {
+  height: auto;
+  max-height: none;
+}
+
+.carousel img {
+  position: relative;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+
+.carousel {
+  height: 420px;
+}
+
+.carousel img {
+  position: absolute;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel img.slide-2 {
+  object-position: center;
+}
+

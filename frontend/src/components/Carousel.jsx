@@ -22,9 +22,20 @@ export default function Carousel() {
           key={src}
           src={src}
           alt="Bouquet"
-          className={idx === index ? "active" : ""}
+          className={`${idx === index ? "active" : ""} slide-${idx}`}
         />
       ))}
+      <div className="carousel-dots" aria-label="Carousel navigation">
+        {slides.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            className={idx === index ? "dot active" : "dot"}
+            onClick={() => setIndex(idx)}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
