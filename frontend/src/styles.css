@@ -926,3 +926,11 @@ body {
   height: 56px;
 }
 
+
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #b42318;
+}
+
