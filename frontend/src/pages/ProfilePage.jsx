@@ -22,6 +22,8 @@ export default function ProfilePage() {
     }
   }, [user, navigate]);
 
+  const isVerified = !!profile?.emailVerified;
+
   return (
     <div className="page profile-page">
       <aside className="profile-sidebar">
@@ -40,7 +42,26 @@ export default function ProfilePage() {
         {active === "My Profile" && (
           <div className="profile-details">
             <p><strong>Full Name:</strong> {profile?.name || ""}</p>
-            <p><strong>Email:</strong> {profile?.email || ""}</p>
+            <p>
+              <strong>Email:</strong> {profile?.email || ""}
+              <span className={isVerified ? "verified-badge" : "unverified-badge"}>
+                {isVerified ? (
+                  <>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    Verified
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                    Not Verified
+                  </>
+                )}
+              </span>
+            </p>
             <p><strong>Phone Number:</strong> {profile?.phoneNumber || ""}</p>
             <p><strong>Zodiac Sign:</strong> </p>
             <p><strong>Date of Birth:</strong> </p>

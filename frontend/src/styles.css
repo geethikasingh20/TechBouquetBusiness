@@ -1049,3 +1049,51 @@ body {
   color: #d6a860;
 }
 
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.verified-badge svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: #1b5e20;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+.unverified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.unverified-badge svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: #92400e;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
