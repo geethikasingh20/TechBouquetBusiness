@@ -63,7 +63,7 @@ public class SendGridEmailService {
                         + "</div>";
 
         String html = "<div style=\"font-family: Arial, sans-serif; line-height: 1.5; padding: 24px; " + backgroundStyle + "\">"
-                + "<div style=\"background:rgba(255,255,255,0.92);padding:24px;border-radius:16px;\">"
+                + "<div style=\"background:transparent;padding:24px;border-radius:16px;\">"
                 + logoBlock
                 + "<h2>Welcome, " + safeName + "!</h2>"
                 + "<p>Thank you for joining Velvet Petals. We are excited to help you send beautiful flowers, plants, and gifts.</p>"
