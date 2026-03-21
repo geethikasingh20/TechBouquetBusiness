@@ -18,14 +18,14 @@ public class ProductController {
 
     @GetMapping
     public List<Product> list() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAllActiveWithImages();
         log.info("Products list size={}", products.size());
         return products;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> get(@PathVariable Long id) {
-        return productRepository.findById(id)
+        return productRepository.findActiveByIdWithImages(id)
                 .map(product -> {
                     log.info("Product detail id={} found", id);
                     return ResponseEntity.ok(product);
@@ -38,7 +38,7 @@ public class ProductController {
 
     @GetMapping("/search")
     public List<Product> search(@RequestParam("q") String query) {
-        List<Product> results = productRepository.findByNameContainingIgnoreCase(query);
+        List<Product> results = productRepository.findByNameContainingIgnoreCaseAndActiveTrue(query);
         log.info("Product search q='{}' results={}", query, results.size());
         return results;
     }
