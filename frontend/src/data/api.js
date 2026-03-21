@@ -1,6 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 const PRODUCTS_CACHE_KEY = "techbouquet_products_cache";
 const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
+let productsFetchPromise = null;
 
 export async function apiFetch(path, options = {}) {
   const { headers = {}, ...rest } = options;
@@ -76,9 +77,19 @@ export function writeProductsCache(items) {
 export async function fetchProductsCached() {
   const cached = readProductsCache();
   if (cached) return { items: cached, cached: true };
-  const items = await fetchProducts();
-  writeProductsCache(items);
-  return { items, cached: false };
+  if (productsFetchPromise) return productsFetchPromise;
+
+  productsFetchPromise = (async () => {
+    const items = await fetchProducts();
+    writeProductsCache(items);
+    return { items, cached: false };
+  })();
+
+  try {
+    return await productsFetchPromise;
+  } finally {
+    productsFetchPromise = null;
+  }
 }
 
 export async function fetchProductById(id) {

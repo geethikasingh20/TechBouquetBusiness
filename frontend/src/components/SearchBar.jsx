@@ -1,29 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchProductsCached } from "../data/api";
+import { searchProducts } from "../data/api";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
-  const [products, setProducts] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const { items } = await fetchProductsCached();
-        setProducts(items);
-      } catch (error) {
-        setProducts([]);
-      }
-    };
-    load();
-  }, []);
+    if (query.trim().length < 3) {
+      setSuggestions([]);
+      return;
+    }
 
-  const suggestions = useMemo(() => {
-    if (query.trim().length < 3) return [];
-    const lower = query.toLowerCase();
-    return products.filter((p) => p.name.toLowerCase().includes(lower)).slice(0, 6);
-  }, [query, products]);
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchProducts(query.trim());
+        setSuggestions((results || []).slice(0, 6));
+      } catch {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
