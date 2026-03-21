@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Carousel from "../components/Carousel";
 import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
-import { fetchProductsCached } from "../data/api";
+import { fetchProductSummariesCached } from "../data/api";
 
 
 export default function HomePage() {
@@ -36,9 +36,13 @@ const [products, setProducts] = useState([]);
   useEffect(() => {
     const load = async () => {
       try {
-        const { items } = await fetchProductsCached();
-        setProducts(items);
-        setBestsellers(buildBestsellers(items));
+        const { items } = await fetchProductSummariesCached();
+        const normalized = (items || []).map((item) => ({
+          ...item,
+          images: item.imageUrl ? [{ url: item.imageUrl }] : []
+        }));
+        setProducts(normalized);
+        setBestsellers(buildBestsellers(normalized));
       } catch (error) {
         setProducts([]);
       } finally {

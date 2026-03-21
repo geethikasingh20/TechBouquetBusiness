@@ -1,5 +1,6 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 const PRODUCTS_CACHE_KEY = "techbouquet_products_cache";
+const PRODUCTS_SUMMARY_CACHE_KEY = "techbouquet_products_summary_cache";
 const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
 let productsFetchPromise = null;
 
@@ -57,6 +58,10 @@ export async function fetchProducts() {
   return apiFetch("/api/products");
 }
 
+export async function fetchProductSummaries() {
+  return apiFetch("/api/products/summary");
+}
+
 export function readProductsCache() {
   try {
     const raw = localStorage.getItem(PRODUCTS_CACHE_KEY);
@@ -72,6 +77,23 @@ export function readProductsCache() {
 
 export function writeProductsCache(items) {
   localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+}
+
+export function readProductsSummaryCache() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_SUMMARY_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.items || !parsed?.ts) return null;
+    if (Date.now() - parsed.ts > PRODUCTS_CACHE_TTL_MS) return null;
+    return parsed.items;
+  } catch {
+    return null;
+  }
+}
+
+export function writeProductsSummaryCache(items) {
+  localStorage.setItem(PRODUCTS_SUMMARY_CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
 }
 
 export async function fetchProductsCached() {
@@ -90,6 +112,14 @@ export async function fetchProductsCached() {
   } finally {
     productsFetchPromise = null;
   }
+}
+
+export async function fetchProductSummariesCached() {
+  const cached = readProductsSummaryCache();
+  if (cached) return { items: cached, cached: true };
+  const items = await fetchProductSummaries();
+  writeProductsSummaryCache(items);
+  return { items, cached: false };
 }
 
 export async function fetchProductById(id) {

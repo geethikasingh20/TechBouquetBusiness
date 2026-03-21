@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findByNameContainingIgnoreCase(String name);
+
     @EntityGraph(attributePaths = "images")
     @Query("select distinct p from Product p where p.active = true")
     List<Product> findAllActiveWithImages();
@@ -18,4 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @EntityGraph(attributePaths = "images")
     List<Product> findByNameContainingIgnoreCaseAndActiveTrue(String name);
+
+    @Query(value = "select p.id as id, p.name as name, p.price as price, p.rating as rating, p.category as category, p.subcategory as subcategory, (select pi.url from product_images pi where pi.product_id = p.id order by pi.sort_order asc limit 1) as imageUrl from products p where p.active = true order by p.id asc", nativeQuery = true)
+    List<ProductSummaryView> findProductSummaries();
 }

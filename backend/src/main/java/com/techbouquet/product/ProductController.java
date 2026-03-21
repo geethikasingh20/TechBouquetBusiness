@@ -1,6 +1,7 @@
 package com.techbouquet.product;
 
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,15 @@ public class ProductController {
 
     public ProductController(ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+
+    @Cacheable("products.summary")
+    @GetMapping("/summary")
+    public List<ProductSummaryView> summary() {
+        List<ProductSummaryView> products = productRepository.findProductSummaries();
+        log.info("Products summary size={}", products.size());
+        return products;
     }
 
     @GetMapping
