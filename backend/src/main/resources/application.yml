@@ -5,7 +5,7 @@ spring:
   config:
     import: optional:file:backend/.env[.properties],optional:file:.env[.properties]
   datasource:
-    # url: jdbc:postgresql://localhost:5432/techbouquet
+    ## url: jdbc:postgresql://localhost:5432/techbouquet
     # username: postgres
     # password: postgres
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/techbouquet}
