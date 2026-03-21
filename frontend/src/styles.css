@@ -130,7 +130,7 @@ main {
 .category-bar {
   display: flex;
   gap: 18px;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
@@ -1094,7 +1094,7 @@ body {
 
 
 .page {
-  padding: 20px 8vw 48px;
+  padding: 12px 8vw 48px;
 }
 
 .category-bar {
