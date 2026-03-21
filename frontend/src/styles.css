@@ -1968,3 +1968,135 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
 }
+
+
+@media (max-width: 980px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-left {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    max-width: none;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .category-bar {
+    padding: 0 4vw;
+  }
+
+  .product-page {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    padding: 12px 16px;
+  }
+
+  .menu-wrapper {
+    order: 1;
+  }
+
+  .header-left {
+    order: 2;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .search-wrapper {
+    order: 3;
+  }
+
+  .header-actions {
+    order: 4;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .category-bar {
+    gap: 10px;
+    padding: 0 16px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .category-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel {
+    border-radius: 12px;
+  }
+
+  .marquee-card {
+    min-width: 160px;
+    padding: 6px 10px;
+  }
+
+  .marquee-card img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .product-gallery .main-image {
+    height: auto;
+  }
+
+  .thumbnail-row {
+    flex-wrap: wrap;
+  }
+
+  .cart-header {
+    display: none;
+  }
+
+  .cart-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-image {
+    height: 38px;
+  }
+
+  .location-block .deliver {
+    font-size: 12px;
+  }
+
+  .location-block .city {
+    font-size: 12px;
+  }
+
+  .profile-avatar img,
+  .tokri-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .welcome-text {
+    font-size: 12px;
+  }
+
+  .marquee-card {
+    min-width: 140px;
+  }
+}
