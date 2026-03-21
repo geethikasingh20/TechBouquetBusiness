@@ -2100,3 +2100,22 @@ body {
     min-width: 140px;
   }
 }
+
+
+
+
+.add-to-cart-btn {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-to-cart-btn .btn-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: inherit;
+}

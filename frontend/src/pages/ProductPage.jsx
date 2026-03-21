@@ -131,13 +131,12 @@ export default function ProductPage() {
             </div>
           )}
           */}
-          <button className="primary" onClick={handleAdd} disabled={adding}>
-            {adding ? (
-              <span className="btn-loading">
-                <span className="spinner" /> Adding...
+          <button className="primary add-to-cart-btn" onClick={handleAdd} disabled={adding}>
+            Add to Cart
+            {adding && (
+              <span className="btn-loading" aria-live="polite">
+                <span className="spinner small" />
               </span>
-            ) : (
-              "Add to Cart"
             )}
           </button>
 

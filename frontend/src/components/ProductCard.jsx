@@ -26,13 +26,12 @@ export default function ProductCard({ product }) {
       </Link>
       <h4>{product.name}</h4>
       <p>Rs. {product.price}</p>
-      <button className="primary" onClick={handleAdd} disabled={adding}>
-        {adding ? (
-          <span className="btn-loading">
-            <span className="spinner" /> Adding...
+      <button className="primary add-to-cart-btn" onClick={handleAdd} disabled={adding}>
+        Add to Cart
+        {adding && (
+          <span className="btn-loading" aria-live="polite">
+            <span className="spinner small" />
           </span>
-        ) : (
-          "Add to Cart"
         )}
       </button>
     </div>
