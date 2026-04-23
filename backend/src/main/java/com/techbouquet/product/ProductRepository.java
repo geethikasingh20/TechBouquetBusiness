@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCase(String name);
+    long countByActiveTrue();
 
     @EntityGraph(attributePaths = "images")
     @Query("select distinct p from Product p where p.active = true")

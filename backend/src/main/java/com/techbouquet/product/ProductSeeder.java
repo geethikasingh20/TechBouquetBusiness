@@ -2,11 +2,14 @@ package com.techbouquet.product;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProductSeeder implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(ProductSeeder.class);
     private final ProductRepository productRepository;
 
     public ProductSeeder(ProductRepository productRepository) {
@@ -15,9 +18,16 @@ public class ProductSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (productRepository.count() > 0) {
+        long totalProducts = productRepository.count();
+        long activeProducts = productRepository.countByActiveTrue();
+        log.info("ProductSeeder startup totalProducts={} activeProducts={}", totalProducts, activeProducts);
+
+        // Seed only when catalog visible to users is empty.
+        if (activeProducts > 0) {
+            log.info("ProductSeeder skipped because active catalog already exists.");
             return;
         }
+        log.info("ProductSeeder seeding default catalog...");
 
         seedProduct(
                 "Sunrise Rose Bouquet",
@@ -92,6 +102,7 @@ public class ProductSeeder implements CommandLineRunner {
                         "https://tse3.mm.bing.net/th/id/OIP.y1Au71wsTqb-WaBhSyR_hQHaK0?rs=1&pid=ImgDetMain&o=7&rm=3"
                 )
         );
+        log.info("ProductSeeder completed. activeProductsNow={}", productRepository.countByActiveTrue());
     }
 
     private void seedProduct(String name,
