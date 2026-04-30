@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { fetchProductById } from "../data/api";
 import { addons } from "../data/products";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
 
 export default function ProductPage() {
   const { id } = useParams();
   const { addItem } = useCart();
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -43,10 +40,6 @@ export default function ProductPage() {
   };
 
   const handleAdd = async () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
     setAdding(true);
     await addItem(product, selectedAddons);
     setAdding(false);

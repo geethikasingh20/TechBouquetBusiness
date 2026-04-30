@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 const CART_CACHE_KEY = "techbouquet_cart_cache";
+const GUEST_CART_OWNER = "guest";
 
 function normalizeAddons(value) {
   return Array.isArray(value) ? value : [];
@@ -38,6 +39,10 @@ function clearCache() {
   localStorage.removeItem(CART_CACHE_KEY);
 }
 
+function cartOwner(user) {
+  return user?.email || GUEST_CART_OWNER;
+}
+
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -45,13 +50,14 @@ export function CartProvider({ children }) {
 
   useEffect(() => {
     const loadCart = async () => {
+      const owner = cartOwner(user);
+      const cached = readCache(owner);
+
       if (!user?.token) {
-        setItems([]);
-        clearCache();
+        setItems(cached || []);
         return;
       }
 
-      const cached = readCache(user.email);
       if (cached) {
         setItems(cached);
       }
@@ -60,7 +66,7 @@ export function CartProvider({ children }) {
       try {
         const data = await fetchCart(user.token);
         setItems(data);
-        writeCache(user.email, data);
+        writeCache(owner, data);
       } catch (error) {
         // Keep cached items to avoid UI flicker
       } finally {
@@ -71,11 +77,8 @@ export function CartProvider({ children }) {
   }, [user]);
 
   const addItem = async (product, addons = []) => {
-    if (!user?.token) {
-      throw new Error("LOGIN_REQUIRED");
-    }
-
     const safeAddons = normalizeAddons(addons);
+    const owner = cartOwner(user);
 
     // Optimistic update
     setItems((prev) => {
@@ -86,7 +89,7 @@ export function CartProvider({ children }) {
         const updated = prev.map((item) =>
           item === existing ? { ...item, quantity: item.quantity + 1 } : item
         );
-        writeCache(user.email, updated);
+        writeCache(owner, updated);
         return updated;
       }
       const updated = [
@@ -100,9 +103,13 @@ export function CartProvider({ children }) {
           addons: safeAddons
         }
       ];
-      writeCache(user.email, updated);
+      writeCache(owner, updated);
       return updated;
     });
+
+    if (!user?.token) {
+      return;
+    }
 
     try {
       const data = await addCartItem(user.token, {
@@ -110,63 +117,70 @@ export function CartProvider({ children }) {
         addonsJson: JSON.stringify(safeAddons)
       });
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
       return;
     }
   };
 
   const updateQuantity = async (id, quantity) => {
-    if (!user?.token) return;
+    const owner = cartOwner(user);
     setItems((prev) => {
       const updated = prev.map((item) => (item.id === id ? { ...item, quantity } : item));
-      writeCache(user.email, updated);
+      writeCache(owner, updated);
       return updated;
     });
+    if (!user?.token) return;
     try {
       const data = await updateCartItem(user.token, id, quantity);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     }
   };
 
   const removeItem = async (id) => {
-    if (!user?.token) return;
+    const owner = cartOwner(user);
     setItems((prev) => {
       const updated = prev.filter((item) => item.id !== id);
-      writeCache(user.email, updated);
+      writeCache(owner, updated);
       return updated;
     });
+    if (!user?.token) return;
     try {
       const data = await removeCartItem(user.token, id);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     }
   };
 
   const clearCart = async () => {
-    if (!user?.token) return;
+    const owner = cartOwner(user);
     setItems([]);
-    writeCache(user.email, []);
+    if (owner === GUEST_CART_OWNER) {
+      clearCache();
+    } else {
+      writeCache(owner, []);
+    }
+    if (!user?.token) return;
     try {
       const data = await clearCartApi(user.token);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     } catch (error) {
       const data = await fetchCart(user.token);
       setItems(data);
-      writeCache(user.email, data);
+      writeCache(owner, data);
     }
   };
 

@@ -1,19 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
 
   const handleAdd = async () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
     setAdding(true);
     await addItem(product);
     setAdding(false);
