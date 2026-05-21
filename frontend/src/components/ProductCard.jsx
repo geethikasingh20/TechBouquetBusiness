@@ -5,11 +5,18 @@ import { useCart } from "../context/CartContext";
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
   const [adding, setAdding] = useState(false);
+  const MIN_LOADING_MS = 300;
 
   const handleAdd = async () => {
     setAdding(true);
-    await addItem(product);
-    setAdding(false);
+    try {
+      await Promise.all([
+        addItem(product),
+        new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS))
+      ]);
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (

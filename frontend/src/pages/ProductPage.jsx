@@ -13,6 +13,7 @@ export default function ProductPage() {
   const [selectedImage, setSelectedImage] = useState("");
   const [pincode, setPincode] = useState("");
   const [selectedAddons, setSelectedAddons] = useState([]);
+  const MIN_LOADING_MS = 300;
 
   useEffect(() => {
     const load = async () => {
@@ -41,8 +42,14 @@ export default function ProductPage() {
 
   const handleAdd = async () => {
     setAdding(true);
-    await addItem(product, selectedAddons);
-    setAdding(false);
+    try {
+      await Promise.all([
+        addItem(product, selectedAddons),
+        new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS))
+      ]);
+    } finally {
+      setAdding(false);
+    }
   };
 
   if (loading) {
