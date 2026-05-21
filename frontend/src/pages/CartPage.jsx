@@ -76,7 +76,7 @@ export default function CartPage() {
             <div key={item.id} className="cart-row">
               <div className="cart-col">
                 <Link to={`/product/${item.productId}`} className="cart-link" target="_blank" rel="noreferrer">
-                  <img className="cart-thumb" src={item.imageUrl} alt={item.name} />
+                  <img className="cart-thumb" src={item.imageUrl || "/logoImage.png"} alt={item.name} />
                 </Link>
               </div>
               <div className="cart-col item-col">

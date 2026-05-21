@@ -43,6 +43,11 @@ function cartOwner(user) {
   return user?.email || GUEST_CART_OWNER;
 }
 
+function getProductImageUrl(product) {
+  if (!product) return "";
+  return product.imageUrl || product.images?.[0]?.url || product.images?.[0] || "";
+}
+
 export function CartProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
@@ -100,7 +105,8 @@ export function CartProvider({ children }) {
           name: product.name,
           price: Number(product.price),
           quantity: 1,
-          addons: safeAddons
+          addons: safeAddons,
+          imageUrl: getProductImageUrl(product)
         }
       ];
       writeCache(owner, updated);
