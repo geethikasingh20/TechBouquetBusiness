@@ -13,7 +13,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByCartAndProductAndAddonsJson(Cart cart, Product product, String addonsJson);
     Optional<CartItem> findByCartAndProductAndAddonsJsonIsNull(Cart cart, Product product);
 
-    @Query("select c from CartItem c where c.cart = :cart order by c.updatedAt desc, c.id desc")
+    @Query("select c from CartItem c where c.cart = :cart order by c.id desc")
     List<CartItem> findByCartOrderByUpdatedAtDescIdDesc(@Param("cart") Cart cart);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
