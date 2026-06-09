@@ -7,7 +7,7 @@ import { useCart } from "../context/CartContext";
 
 export default function ProductPage() {
   const { id } = useParams();
-  const { addItem } = useCart();
+  const { items, addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -35,6 +35,26 @@ export default function ProductPage() {
     };
     load();
   }, [id]);
+
+  useEffect(() => {
+    if (!product || pincode || !items.length) return;
+
+    const existingItem = items.find(
+      (item) =>
+        String(item.productId) === String(product.id) &&
+        typeof item.deliveryPincode === "string" &&
+        item.deliveryPincode.trim().length === 6,
+    );
+
+    if (!existingItem) return;
+
+    const savedPincode = existingItem.deliveryPincode.trim();
+    if (!bangalorePincodes.includes(savedPincode)) return;
+
+    setPincode(savedPincode);
+    setDeliveryStatus("available");
+    setDeliveryMessage(`Delivery available for ${savedPincode} in Bengaluru.`);
+  }, [product, items, pincode]);
 
   const toggleAddon = (addon) => {
     setSelectedAddons((prev) =>
