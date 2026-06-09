@@ -18,10 +18,16 @@ export default function ProductPage() {
   const [selectedAddons, setSelectedAddons] = useState([]);
   const MIN_LOADING_MS = 300;
   const pincodeInputRef = useRef(null);
+  const hasHydratedCartSelectionRef = useRef(false);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      setSelectedAddons([]);
+      setPincode("");
+      setDeliveryStatus("idle");
+      setDeliveryMessage("");
+      hasHydratedCartSelectionRef.current = false;
       try {
         const data = await fetchProductById(id);
         setProduct(data);
@@ -37,7 +43,7 @@ export default function ProductPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!product || pincode || !items.length) return;
+    if (!product || !items.length || hasHydratedCartSelectionRef.current) return;
 
     const existingItem = items.find(
       (item) =>
@@ -51,10 +57,18 @@ export default function ProductPage() {
     const savedPincode = existingItem.deliveryPincode.trim();
     if (!bangalorePincodes.includes(savedPincode)) return;
 
-    setPincode(savedPincode);
+    if (!pincode) {
+      setPincode(savedPincode);
+    }
+
+    if (selectedAddons.length === 0) {
+      setSelectedAddons(existingItem.addons || []);
+    }
+
     setDeliveryStatus("available");
     setDeliveryMessage(`Delivery available for ${savedPincode} in Bengaluru.`);
-  }, [product, items, pincode]);
+    hasHydratedCartSelectionRef.current = true;
+  }, [product, items, pincode, selectedAddons.length]);
 
   const toggleAddon = (addon) => {
     setSelectedAddons((prev) =>

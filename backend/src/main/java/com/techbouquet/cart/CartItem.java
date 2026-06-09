@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "cart_items", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"cart_id", "product_id", "addons_json", "delivery_pincode"})
+        @UniqueConstraint(columnNames = {"cart_id", "product_id", "delivery_pincode"})
 })
 public class CartItem {
     @Id

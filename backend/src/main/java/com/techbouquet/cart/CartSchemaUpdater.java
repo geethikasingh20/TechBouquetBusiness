@@ -33,9 +33,29 @@ public class CartSchemaUpdater implements CommandLineRunner {
             }
 
             jdbcTemplate.execute(
-                    "CREATE UNIQUE INDEX IF NOT EXISTS cart_items_unique_delivery_idx " +
-                            "ON cart_items(cart_id, product_id, addons_json, delivery_pincode)"
+                    "WITH ranked AS (" +
+                            " SELECT id, cart_id, product_id, delivery_pincode, quantity, addons_json, updated_at," +
+                            " ROW_NUMBER() OVER (PARTITION BY cart_id, product_id, delivery_pincode ORDER BY updated_at DESC, id DESC) AS rn," +
+                            " SUM(quantity) OVER (PARTITION BY cart_id, product_id, delivery_pincode) AS total_qty," +
+                            " FIRST_VALUE(addons_json) OVER (PARTITION BY cart_id, product_id, delivery_pincode ORDER BY updated_at DESC, id DESC) AS latest_addons" +
+                            " FROM cart_items" +
+                            ")" +
+                            " UPDATE cart_items c" +
+                            " SET quantity = ranked.total_qty, addons_json = ranked.latest_addons" +
+                            " FROM ranked" +
+                            " WHERE c.id = ranked.id AND ranked.rn = 1"
             );
+
+            jdbcTemplate.execute(
+                    "DELETE FROM cart_items c USING (" +
+                            " SELECT id FROM (" +
+                            "   SELECT id, ROW_NUMBER() OVER (PARTITION BY cart_id, product_id, delivery_pincode ORDER BY updated_at DESC, id DESC) AS rn" +
+                            "   FROM cart_items" +
+                            " ) ranked_delete WHERE rn > 1" +
+                            ") duplicates WHERE c.id = duplicates.id"
+            );
+
+            jdbcTemplate.execute("CREATE UNIQUE INDEX IF NOT EXISTS cart_items_unique_delivery_idx ON cart_items(cart_id, product_id, delivery_pincode)");
             log.info("Cart schema check complete (delivery_pincode column).");
         } catch (Exception ex) {
             log.warn("Cart schema update failed: delivery_pincode column", ex);

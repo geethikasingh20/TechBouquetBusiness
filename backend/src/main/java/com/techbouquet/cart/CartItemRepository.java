@@ -10,8 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    Optional<CartItem> findByCartAndProductAndAddonsJsonAndDeliveryPincode(Cart cart, Product product, String addonsJson, String deliveryPincode);
-    Optional<CartItem> findByCartAndProductAndAddonsJsonIsNullAndDeliveryPincode(Cart cart, Product product, String deliveryPincode);
+    Optional<CartItem> findByCartAndProductAndDeliveryPincode(Cart cart, Product product, String deliveryPincode);
 
     @Query("select c from CartItem c where c.cart = :cart order by c.id desc")
     List<CartItem> findByCartOrderByUpdatedAtDescIdDesc(@Param("cart") Cart cart);
@@ -20,8 +19,11 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     @Transactional
     @Query(value = "INSERT INTO cart_items (cart_id, product_id, addons_json, delivery_pincode, quantity, updated_at) " +
             "VALUES (:cartId, :productId, :addonsJson, :deliveryPincode, 1, clock_timestamp()) " +
-            "ON CONFLICT (cart_id, product_id, addons_json, delivery_pincode) " +
-            "DO UPDATE SET quantity = cart_items.quantity + 1, updated_at = clock_timestamp()", nativeQuery = true)
+            "ON CONFLICT (cart_id, product_id, delivery_pincode) " +
+            "DO UPDATE SET " +
+            "quantity = CASE WHEN cart_items.addons_json = EXCLUDED.addons_json THEN cart_items.quantity + 1 ELSE cart_items.quantity END, " +
+            "addons_json = EXCLUDED.addons_json, " +
+            "updated_at = clock_timestamp()", nativeQuery = true)
     int upsertIncrement(@Param("cartId") Long cartId,
                         @Param("productId") Long productId,
                         @Param("addonsJson") String addonsJson,

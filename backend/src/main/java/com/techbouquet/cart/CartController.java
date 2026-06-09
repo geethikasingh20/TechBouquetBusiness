@@ -7,7 +7,9 @@ import com.techbouquet.customer.CustomerRepository;
 import com.techbouquet.product.Product;
 import com.techbouquet.product.ProductRepository;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +59,29 @@ public class CartController {
         String addonsJson = normalizeAddonsJson(request.getAddonsJson());
         String deliveryPincode = normalizeDeliveryPincode(request.getDeliveryPincode());
 
-        cartItemRepository.upsertIncrement(cart.getId(), product.getId(), addonsJson, deliveryPincode);
+        List<CartAddon> incomingAddons = parseAddons(addonsJson);
+        CartItem existing = cartItemRepository.findByCartAndProductAndDeliveryPincode(cart, product, deliveryPincode)
+                .orElse(null);
+
+        if (existing == null) {
+            CartItem created = new CartItem();
+            created.setCart(cart);
+            created.setProduct(product);
+            created.setAddonsJson(serializeAddons(incomingAddons));
+            created.setDeliveryPincode(deliveryPincode);
+            created.setQuantity(1);
+            cartItemRepository.save(created);
+        } else {
+            List<CartAddon> existingAddons = parseAddons(existing.getAddonsJson());
+            List<CartAddon> mergedAddons = mergeAddons(existingAddons, incomingAddons);
+            boolean sameAddonSet = addonsEqual(existingAddons, incomingAddons);
+
+            existing.setAddonsJson(serializeAddons(mergedAddons));
+            if (sameAddonSet) {
+                existing.setQuantity(existing.getQuantity() + 1);
+            }
+            cartItemRepository.save(existing);
+        }
         log.info("Cart add upsert user={} productId={} pincode={}", principal.getName(), product.getId(), deliveryPincode);
 
         List<CartItem> items = cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart);
@@ -115,6 +139,44 @@ public class CartController {
             return "";
         }
         return deliveryPincode;
+    }
+
+    private List<CartAddon> mergeAddons(List<CartAddon> existing, List<CartAddon> incoming) {
+        Map<String, CartAddon> merged = new LinkedHashMap<>();
+        for (CartAddon addon : existing) {
+            if (addon == null || addon.getId() == null) continue;
+            merged.put(addon.getId(), addon);
+        }
+        for (CartAddon addon : incoming) {
+            if (addon == null || addon.getId() == null) continue;
+            merged.putIfAbsent(addon.getId(), addon);
+        }
+        return new ArrayList<>(merged.values());
+    }
+
+    private boolean addonsEqual(List<CartAddon> existing, List<CartAddon> incoming) {
+        if (existing.size() != incoming.size()) {
+            return false;
+        }
+        List<String> leftIds = existing.stream()
+                .map(addon -> addon == null ? null : String.valueOf(addon.getId()))
+                .filter(id -> id != null && !id.isBlank())
+                .sorted()
+                .toList();
+        List<String> rightIds = incoming.stream()
+                .map(addon -> addon == null ? null : String.valueOf(addon.getId()))
+                .filter(id -> id != null && !id.isBlank())
+                .sorted()
+                .toList();
+        return leftIds.equals(rightIds);
+    }
+
+    private String serializeAddons(List<CartAddon> addons) {
+        try {
+            return objectMapper.writeValueAsString(addons);
+        } catch (Exception e) {
+            return "[]";
+        }
     }
 
     private List<CartItemResponse> toResponse(List<CartItem> items) {

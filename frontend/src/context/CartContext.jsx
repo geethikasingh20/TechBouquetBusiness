@@ -15,9 +15,24 @@ function normalizePincode(value) {
 }
 
 function sameAddons(a, b) {
-  const left = normalizeAddons(a);
-  const right = normalizeAddons(b);
+  const left = normalizeAddons(a).map((addon) => String(addon?.id ?? "")).filter(Boolean).sort();
+  const right = normalizeAddons(b).map((addon) => String(addon?.id ?? "")).filter(Boolean).sort();
   return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function mergeAddons(existing, incoming) {
+  const merged = new Map();
+  for (const addon of normalizeAddons(existing)) {
+    if (addon?.id == null) continue;
+    merged.set(String(addon.id), addon);
+  }
+  for (const addon of normalizeAddons(incoming)) {
+    if (addon?.id == null) continue;
+    if (!merged.has(String(addon.id))) {
+      merged.set(String(addon.id), addon);
+    }
+  }
+  return Array.from(merged.values());
 }
 
 function readCache(email) {
@@ -95,12 +110,17 @@ export function CartProvider({ children }) {
       const existing = prev.find(
         (item) =>
           item.productId === product.id &&
-          sameAddons(item.addons, safeAddons) &&
           normalizePincode(item.deliveryPincode) === safePincode
       );
       if (existing) {
+        const mergedAddons = mergeAddons(existing.addons, safeAddons);
+        const sameAddonSet = sameAddons(existing.addons, safeAddons);
         const updated = prev.map((item) =>
-          item === existing ? { ...item, quantity: item.quantity + 1 } : item
+          item === existing
+            ? sameAddonSet
+              ? { ...item, quantity: item.quantity + 1 }
+              : { ...item, addons: mergedAddons }
+            : item
         );
         writeCache(owner, updated);
         return updated;
