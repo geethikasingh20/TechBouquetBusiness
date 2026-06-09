@@ -46,9 +46,6 @@ public class CartController {
         return toResponse(items);
     }
 
-/**
- * TODO - put limit on the cart
- */
     @PostMapping("/items")
     @Transactional
     public List<CartItemResponse> addItem(@RequestBody CartItemRequest request, java.security.Principal principal) {

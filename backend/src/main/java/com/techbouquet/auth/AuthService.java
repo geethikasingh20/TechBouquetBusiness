@@ -8,7 +8,6 @@ import com.techbouquet.customer.Customer;
 import com.techbouquet.customer.CustomerRepository;
 import com.techbouquet.email.SendGridEmailService;
 import java.time.Instant;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,20 +49,13 @@ public class AuthService {
             throw new IllegalArgumentException("Email already registered");
         }
 
-        String normalizedEmail = request.getEmail().toLowerCase(Locale.ROOT);
-        String maskedIp = maskIpForStorage(ipAddress);
-        Instant now = Instant.now();
-
         Customer customer = new Customer();
         customer.setName(request.getName());
-        customer.setEmail(normalizedEmail);
+        customer.setEmail(request.getEmail().toLowerCase());
         customer.setPhoneNumber(request.getPhoneNumber());
         customer.setPassword(passwordEncoder.encode(request.getPassword()));
-        customer.setRegisteredIp(maskedIp);
-        customer.setCreatedAt(now);
-        // Registration response also logs user in, so keep first login metadata.
-        customer.setLastLoginAt(now);
-        customer.setLastLoginIp(maskedIp);
+        customer.setRegisteredIp(ipAddress);
+        customer.setCreatedAt(Instant.now());
 
         Customer saved = customerRepository.save(customer);
         log.info("Registered user id={} email={}", saved.getId(), saved.getEmail());
@@ -85,16 +77,13 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        String normalizedEmail = request.getEmail().toLowerCase(Locale.ROOT);
-        String maskedIp = maskIpForStorage(ipAddress);
-
-        Customer customer = customerRepository.findByEmail(normalizedEmail)
+        Customer customer = customerRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 
         customer.setLastLoginAt(Instant.now());
-        customer.setLastLoginIp(maskedIp);
+        customer.setLastLoginIp(ipAddress);
         customerRepository.save(customer);
-        log.info("Login success user={} ip={}", customer.getEmail(), maskedIp);
+        log.info("Login success user={} ip={}", customer.getEmail(), ipAddress);
 
         String token = jwtService.generateToken(customer.getEmail());
         return new AuthResponse(token, customer.getName(), customer.isEmailVerified());
@@ -114,32 +103,5 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid or expired verification token");
         }
         markEmailVerified(email);
-    }
-
-    private String maskIpForStorage(String ip) {
-        if (ip == null || ip.isBlank()) {
-            return "unknown";
-        }
-        // IPv4: keep first 3 octets
-        if (ip.contains(".")) {
-            int lastDot = ip.lastIndexOf('.');
-            if (lastDot > 0) {
-                return ip.substring(0, lastDot) + ".xxx";
-            }
-        }
-        // IPv6: keep first 4 groups
-        if (ip.contains(":")) {
-            String[] parts = ip.split(":");
-            StringBuilder masked = new StringBuilder();
-            int keep = Math.min(4, parts.length);
-            for (int i = 0; i < keep; i++) {
-                if (i > 0) {
-                    masked.append(':');
-                }
-                masked.append(parts[i].isBlank() ? "0" : parts[i]);
-            }
-            return masked.append(":xxxx:xxxx:xxxx:xxxx").toString();
-        }
-        return "masked";
     }
 }
