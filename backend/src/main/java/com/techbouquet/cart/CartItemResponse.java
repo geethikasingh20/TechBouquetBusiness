@@ -10,8 +10,9 @@ public class CartItemResponse {
     private int quantity;
     private List<CartAddon> addons;
     private String imageUrl;
+    private String deliveryPincode;
 
-    public CartItemResponse(Long id, Long productId, String name, int price, int quantity, List<CartAddon> addons, String imageUrl) {
+    public CartItemResponse(Long id, Long productId, String name, int price, int quantity, List<CartAddon> addons, String imageUrl, String deliveryPincode) {
         this.id = id;
         this.productId = productId;
         this.name = name;
@@ -19,6 +20,7 @@ public class CartItemResponse {
         this.quantity = quantity;
         this.addons = addons;
         this.imageUrl = imageUrl;
+        this.deliveryPincode = deliveryPincode;
     }
 
     public Long getId() {
@@ -47,5 +49,9 @@ public class CartItemResponse {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getDeliveryPincode() {
+        return deliveryPincode;
     }
 }

@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "cart_items", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"cart_id", "product_id", "addons_json"})
+        @UniqueConstraint(columnNames = {"cart_id", "product_id", "addons_json", "delivery_pincode"})
 })
 public class CartItem {
     @Id
@@ -29,6 +29,9 @@ public class CartItem {
     @Column(name = "addons_json", length = 4000, nullable = false)
     private String addonsJson;
 
+    @Column(name = "delivery_pincode", length = 6, nullable = false)
+    private String deliveryPincode = "";
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
@@ -37,6 +40,9 @@ public class CartItem {
     private void ensureDefaults() {
         if (addonsJson == null || addonsJson.isBlank()) {
             addonsJson = "[]";
+        }
+        if (deliveryPincode == null || deliveryPincode.isBlank()) {
+            deliveryPincode = "";
         }
         updatedAt = Instant.now();
     }
@@ -79,6 +85,14 @@ public class CartItem {
 
     public void setAddonsJson(String addonsJson) {
         this.addonsJson = addonsJson;
+    }
+
+    public String getDeliveryPincode() {
+        return deliveryPincode;
+    }
+
+    public void setDeliveryPincode(String deliveryPincode) {
+        this.deliveryPincode = deliveryPincode;
     }
 
     public Instant getUpdatedAt() {

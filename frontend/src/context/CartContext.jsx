@@ -10,6 +10,10 @@ function normalizeAddons(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function normalizePincode(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 function sameAddons(a, b) {
   const left = normalizeAddons(a);
   const right = normalizeAddons(b);
@@ -81,14 +85,18 @@ export function CartProvider({ children }) {
     loadCart();
   }, [user]);
 
-  const addItem = async (product, addons = []) => {
+  const addItem = async (product, addons = [], deliveryPincode = "") => {
     const safeAddons = normalizeAddons(addons);
+    const safePincode = normalizePincode(deliveryPincode);
     const owner = cartOwner(user);
 
     // Optimistic update
     setItems((prev) => {
       const existing = prev.find(
-        (item) => item.productId === product.id && sameAddons(item.addons, safeAddons)
+        (item) =>
+          item.productId === product.id &&
+          sameAddons(item.addons, safeAddons) &&
+          normalizePincode(item.deliveryPincode) === safePincode
       );
       if (existing) {
         const updated = prev.map((item) =>
@@ -106,7 +114,8 @@ export function CartProvider({ children }) {
           price: Number(product.price),
           quantity: 1,
           addons: safeAddons,
-          imageUrl: getProductImageUrl(product)
+          imageUrl: getProductImageUrl(product),
+          deliveryPincode: safePincode
         }
       ];
       writeCache(owner, updated);
@@ -120,7 +129,8 @@ export function CartProvider({ children }) {
     try {
       const data = await addCartItem(user.token, {
         productId: product.id,
-        addonsJson: JSON.stringify(safeAddons)
+        addonsJson: JSON.stringify(safeAddons),
+        deliveryPincode: safePincode
       });
       setItems(data);
       writeCache(owner, data);

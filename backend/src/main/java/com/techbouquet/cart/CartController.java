@@ -55,9 +55,10 @@ public class CartController {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         String addonsJson = normalizeAddonsJson(request.getAddonsJson());
+        String deliveryPincode = normalizeDeliveryPincode(request.getDeliveryPincode());
 
-        cartItemRepository.upsertIncrement(cart.getId(), product.getId(), addonsJson);
-        log.info("Cart add upsert user={} productId={}", principal.getName(), product.getId());
+        cartItemRepository.upsertIncrement(cart.getId(), product.getId(), addonsJson, deliveryPincode);
+        log.info("Cart add upsert user={} productId={} pincode={}", principal.getName(), product.getId(), deliveryPincode);
 
         List<CartItem> items = cartItemRepository.findByCartOrderByUpdatedAtDescIdDesc(cart);
         return toResponse(items);
@@ -109,6 +110,13 @@ public class CartController {
         return addonsJson;
     }
 
+    private String normalizeDeliveryPincode(String deliveryPincode) {
+        if (deliveryPincode == null || deliveryPincode.isBlank()) {
+            return "";
+        }
+        return deliveryPincode;
+    }
+
     private List<CartItemResponse> toResponse(List<CartItem> items) {
         List<CartItemResponse> responses = new ArrayList<>();
         for (CartItem item : items) {
@@ -124,7 +132,8 @@ public class CartController {
                     price,
                     item.getQuantity(),
                     addons,
-                    imageUrl
+                    imageUrl,
+                    item.getDeliveryPincode()
             ));
         }
         return responses;

@@ -102,7 +102,7 @@ export default function ProductPage() {
     setAdding(true);
     try {
       await Promise.all([
-        addItem(product, selectedAddons),
+        addItem(product, selectedAddons, pincode),
         new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS)),
       ]);
     } finally {

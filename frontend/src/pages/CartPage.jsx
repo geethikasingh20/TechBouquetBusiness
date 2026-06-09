@@ -83,6 +83,11 @@ export default function CartPage() {
                 <Link className="cart-link" to={`/product/${item.productId}`} target="_blank" rel="noreferrer">
                   {item.name}
                 </Link>
+                {item.deliveryPincode && (
+                  <span className="pincode-badge" title="Delivery pincode">
+                    {item.deliveryPincode}
+                  </span>
+                )}
                 {item.addons?.length > 0 && (
                   <p className="addons-line">
                     Add-ons: {item.addons.map((addon) => addon.name).join(", ")}

@@ -10,21 +10,22 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    Optional<CartItem> findByCartAndProductAndAddonsJson(Cart cart, Product product, String addonsJson);
-    Optional<CartItem> findByCartAndProductAndAddonsJsonIsNull(Cart cart, Product product);
+    Optional<CartItem> findByCartAndProductAndAddonsJsonAndDeliveryPincode(Cart cart, Product product, String addonsJson, String deliveryPincode);
+    Optional<CartItem> findByCartAndProductAndAddonsJsonIsNullAndDeliveryPincode(Cart cart, Product product, String deliveryPincode);
 
     @Query("select c from CartItem c where c.cart = :cart order by c.id desc")
     List<CartItem> findByCartOrderByUpdatedAtDescIdDesc(@Param("cart") Cart cart);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
-    @Query(value = "INSERT INTO cart_items (cart_id, product_id, addons_json, quantity, updated_at) " +
-            "VALUES (:cartId, :productId, :addonsJson, 1, clock_timestamp()) " +
-            "ON CONFLICT (cart_id, product_id, addons_json) " +
+    @Query(value = "INSERT INTO cart_items (cart_id, product_id, addons_json, delivery_pincode, quantity, updated_at) " +
+            "VALUES (:cartId, :productId, :addonsJson, :deliveryPincode, 1, clock_timestamp()) " +
+            "ON CONFLICT (cart_id, product_id, addons_json, delivery_pincode) " +
             "DO UPDATE SET quantity = cart_items.quantity + 1, updated_at = clock_timestamp()", nativeQuery = true)
     int upsertIncrement(@Param("cartId") Long cartId,
                         @Param("productId") Long productId,
-                        @Param("addonsJson") String addonsJson);
+                        @Param("addonsJson") String addonsJson,
+                        @Param("deliveryPincode") String deliveryPincode);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
