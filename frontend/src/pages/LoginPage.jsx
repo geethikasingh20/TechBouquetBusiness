@@ -24,8 +24,17 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     try {
-      const response = await loginApi({ email: form.email, password: form.password });
-      login({ name: response.name, email: form.email, emailVerified: response.emailVerified, token: response.token });
+      const response = await loginApi({
+        email: form.email,
+        password: form.password,
+      });
+      console.log(JSON.stringify(response));
+      login({
+        name: response.name,
+        email: form.email,
+        emailVerified: response.emailVerified,
+        token: response.token,
+      });
       navigate("/");
     } catch (err) {
       setError("Login failed. Please check your credentials.");
@@ -49,13 +58,27 @@ export default function LoginPage() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
           Email Address
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
         </label>
         <label>
           Password
-          <input type="password" name="password" value={form.password} onChange={handleChange} required />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
         </label>
-        <button className="primary" type="submit">Login</button>
+        <button className="primary" type="submit">
+          Login
+        </button>
       </form>
 
       <p className="auth-switch">
@@ -70,16 +93,22 @@ export default function LoginPage() {
           value={resetEmail}
           onChange={(event) => setResetEmail(event.target.value)}
         />
-        <button className="ghost" type="button">Reset your password</button>
+        <button className="ghost" type="button">
+          Reset your password
+        </button>
       </div>
 
       {user && (
         <div className="welcome-box">
           <p>Welcome {user.name}</p>
           {!user.emailVerified && (
-            <button className="primary" onClick={handleVerify}>Verify Email Address</button>
+            <button className="primary" onClick={handleVerify}>
+              Verify Email Address
+            </button>
           )}
-          <button className="ghost" type="button">Support: support@techbouquet.com</button>
+          <button className="ghost" type="button">
+            Support: support@techbouquet.com
+          </button>
         </div>
       )}
     </div>

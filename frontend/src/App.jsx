@@ -15,10 +15,11 @@ import ContactPage from "./pages/ContactPage";
 import PolicyPage from "./pages/PolicyPage";
 import HelpPage from "./pages/HelpPage";
 import CategoryPage from "./pages/CategoryPage";
-
+import CheckoutPage from "./pages/CheckoutPage";
 export default function App() {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <div className="app-shell">
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="/policy" element={<PolicyPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/category/:category" element={<CategoryPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}
