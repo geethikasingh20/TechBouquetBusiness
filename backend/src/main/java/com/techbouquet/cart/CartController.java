@@ -59,7 +59,7 @@ public class CartController {
         String addonsJson = normalizeAddonsJson(request.getAddonsJson());
         String deliveryPincode = normalizeDeliveryPincode(request.getDeliveryPincode());
 
-        List<CartAddon> incomingAddons = parseAddons(addonsJson);
+        List<CartAddon> incomingAddons = normalizeUniqueAddons(parseAddons(addonsJson));
         CartItem existing = cartItemRepository.findByCartAndProductAndDeliveryPincode(cart, product, deliveryPincode)
                 .orElse(null);
 
@@ -72,7 +72,7 @@ public class CartController {
             created.setQuantity(1);
             cartItemRepository.save(created);
         } else {
-            List<CartAddon> existingAddons = parseAddons(existing.getAddonsJson());
+            List<CartAddon> existingAddons = normalizeUniqueAddons(parseAddons(existing.getAddonsJson()));
             List<CartAddon> mergedAddons = mergeAddons(existingAddons, incomingAddons);
             boolean sameAddonSet = addonsEqual(existingAddons, incomingAddons);
 
@@ -152,6 +152,10 @@ public class CartController {
             merged.putIfAbsent(addon.getId(), addon);
         }
         return new ArrayList<>(merged.values());
+    }
+
+    private List<CartAddon> normalizeUniqueAddons(List<CartAddon> addons) {
+        return mergeAddons(List.of(), addons);
     }
 
     private boolean addonsEqual(List<CartAddon> existing, List<CartAddon> incoming) {

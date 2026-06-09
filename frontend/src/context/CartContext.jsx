@@ -7,7 +7,13 @@ const CART_CACHE_KEY = "techbouquet_cart_cache";
 const GUEST_CART_OWNER = "guest";
 
 function normalizeAddons(value) {
-  return Array.isArray(value) ? value : [];
+  if (!Array.isArray(value)) return [];
+  const unique = new Map();
+  for (const addon of value) {
+    if (addon?.id == null) continue;
+    unique.set(String(addon.id), addon);
+  }
+  return Array.from(unique.values());
 }
 
 function normalizePincode(value) {
