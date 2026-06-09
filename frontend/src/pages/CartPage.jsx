@@ -16,6 +16,14 @@ export default function CartPage() {
     setLocalQty(next);
   }, [items]);
 
+  const getAddonUnitTotal = (item) =>
+    (item.addons || []).reduce((sum, addon) => sum + Number(addon?.price || 0), 0);
+
+  const getLineTotal = (item) => {
+    const addonUnitTotal = getAddonUnitTotal(item);
+    return (Number(item.price || 0) + addonUnitTotal) * Number(item.quantity || 0);
+  };
+
   const scheduleUpdate = (id, value) => {
     const numeric = Number(value || 0);
     const safeValue = Number.isFinite(numeric) ? numeric : 0;
@@ -49,7 +57,7 @@ export default function CartPage() {
     }, 400);
   };
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + getLineTotal(item), 0);
   const groupedItems = items.reduce((groups, item) => {
     const key = item.deliveryPincode?.trim() || "No delivery pincode";
     if (!groups.has(key)) {
@@ -102,7 +110,12 @@ export default function CartPage() {
                       </Link>
                       {item.addons?.length > 0 && (
                         <p className="addons-line">
-                          Add-ons: {item.addons.map((addon) => addon.name).join(", ")}
+                          Add-ons: {item.addons.map((addon) => `${addon.name} (Rs. ${addon.price})`).join(", ")}
+                        </p>
+                      )}
+                      {item.addons?.length > 0 && (
+                        <p className="addons-line">
+                          Add-on subtotal: Rs. {(getAddonUnitTotal(item) * Number(item.quantity || 0))}
                         </p>
                       )}
                     </div>
@@ -137,7 +150,7 @@ export default function CartPage() {
                         {pending[item.id] && <span className="spinner small" />}
                       </div>
                     </div>
-                    <div className="cart-col">Rs. {item.price * item.quantity}</div>
+                    <div className="cart-col">Rs. {getLineTotal(item)}</div>
                     <div className="cart-col"></div>
                   </div>
                 ))}
