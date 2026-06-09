@@ -50,6 +50,14 @@ export default function CartPage() {
   };
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const groupedItems = items.reduce((groups, item) => {
+    const key = item.deliveryPincode?.trim() || "No delivery pincode";
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key).push(item);
+    return groups;
+  }, new Map());
 
   return (
     <div className="page cart-page">
@@ -72,62 +80,69 @@ export default function CartPage() {
             <span>Total</span>
             <span></span>
           </div>
-          {items.map((item) => (
-            <div key={item.id} className="cart-row">
-              <div className="cart-col">
-                <Link to={`/product/${item.productId}`} className="cart-link" target="_blank" rel="noreferrer">
-                  <img className="cart-thumb" src={item.imageUrl || "/logoImage.png"} alt={item.name} />
-                </Link>
+          {Array.from(groupedItems.entries()).map(([deliveryPincode, groupedCartItems]) => (
+            <section key={deliveryPincode} className="cart-group">
+              <div className="cart-group-header">
+                <span className="cart-group-label">Group</span>
+                <span className="cart-group-delivery" title="Delivery pincode">
+                  Deliver to {deliveryPincode}
+                </span>
               </div>
-              <div className="cart-col item-col">
-                <Link className="cart-link" to={`/product/${item.productId}`} target="_blank" rel="noreferrer">
-                  {item.name}
-                </Link>
-                {item.deliveryPincode && (
-                  <span className="pincode-badge" title="Delivery pincode">
-                    {item.deliveryPincode}
-                  </span>
-                )}
-                {item.addons?.length > 0 && (
-                  <p className="addons-line">
-                    Add-ons: {item.addons.map((addon) => addon.name).join(", ")}
-                  </p>
-                )}
+              <div className="cart-group-items">
+                {groupedCartItems.map((item) => (
+                  <div key={item.id} className="cart-row">
+                    <div className="cart-col">
+                      <Link to={`/product/${item.productId}`} className="cart-link" target="_blank" rel="noreferrer">
+                        <img className="cart-thumb" src={item.imageUrl || "/logoImage.png"} alt={item.name} />
+                      </Link>
+                    </div>
+                    <div className="cart-col item-col">
+                      <Link className="cart-link" to={`/product/${item.productId}`} target="_blank" rel="noreferrer">
+                        {item.name}
+                      </Link>
+                      {item.addons?.length > 0 && (
+                        <p className="addons-line">
+                          Add-ons: {item.addons.map((addon) => addon.name).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                    <div className="cart-col">Rs. {item.price}</div>
+                    <div className="cart-col qty-col">
+                      <div className="qty-control">
+                        {(localQty[item.id] ?? item.quantity) > 0 && (
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
+                            disabled={pending[item.id]}
+                          >
+                            -
+                          </button>
+                        )}
+                        <input
+                          type="number"
+                          min="0"
+                          value={localQty[item.id] ?? item.quantity}
+                          onChange={(event) => scheduleUpdate(item.id, event.target.value)}
+                          disabled={pending[item.id]}
+                        />
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) + 1)}
+                          disabled={pending[item.id]}
+                        >
+                          +
+                        </button>
+                        {pending[item.id] && <span className="spinner small" />}
+                      </div>
+                    </div>
+                    <div className="cart-col">Rs. {item.price * item.quantity}</div>
+                    <div className="cart-col"></div>
+                  </div>
+                ))}
               </div>
-              <div className="cart-col">Rs. {item.price}</div>
-              <div className="cart-col qty-col">
-                <div className="qty-control">
-                  {(localQty[item.id] ?? item.quantity) > 0 && (
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) - 1)}
-                      disabled={pending[item.id]}
-                    >
-                      -
-                    </button>
-                  )}
-                  <input
-                    type="number"
-                    min="0"
-                    value={localQty[item.id] ?? item.quantity}
-                    onChange={(event) => scheduleUpdate(item.id, event.target.value)}
-                    disabled={pending[item.id]}
-                  />
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={() => scheduleUpdate(item.id, (localQty[item.id] || item.quantity) + 1)}
-                    disabled={pending[item.id]}
-                  >
-                    +
-                  </button>
-                  {pending[item.id] && <span className="spinner small" />}
-                </div>
-              </div>
-              <div className="cart-col">Rs. {item.price * item.quantity}</div>
-              <div className="cart-col"></div>
-            </div>
+            </section>
           ))}
           <div className="cart-summary">
             <button className="ghost" onClick={clearCart}>Clear Cart</button>

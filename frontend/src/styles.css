@@ -1140,6 +1140,43 @@ body {
   letter-spacing: 0.2px;
 }
 
+.cart-group {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #eadfcd;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+}
+
+.cart-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cart-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cart-group-delivery {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8a5e22;
+}
+
+.cart-group-items {
+  display: grid;
+  gap: 10px;
+}
+
 
 .verified-badge {
   display: inline-flex;
