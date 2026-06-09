@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchProductById } from "../data/api";
 import { addons } from "../data/products";
@@ -17,6 +17,7 @@ export default function ProductPage() {
   const [deliveryMessage, setDeliveryMessage] = useState("");
   const [selectedAddons, setSelectedAddons] = useState([]);
   const MIN_LOADING_MS = 300;
+  const pincodeInputRef = useRef(null);
 
   useEffect(() => {
     const load = async () => {
@@ -91,6 +92,13 @@ export default function ProductPage() {
   };
 
   const handleAdd = async () => {
+    if (deliveryStatus !== "available") {
+      setDeliveryMessage("Enter a valid Bengaluru pincode before adding to cart.");
+      setDeliveryStatus("unavailable");
+      pincodeInputRef.current?.focus();
+      return;
+    }
+
     setAdding(true);
     try {
       await Promise.all([
@@ -198,6 +206,7 @@ export default function ProductPage() {
             <div className="delivery-input-row">
               <div className="delivery-input-wrap">
                 <input
+                  ref={pincodeInputRef}
                   id="delivery-pincode"
                   type="text"
                   value={pincode}
