@@ -115,6 +115,14 @@ export default function CheckoutPage() {
     );
   };
 
+  const isCheckoutReady = () => {
+    const allRecipientsComplete = Object.keys(groupedItems).every((pincode) =>
+      isRecipientComplete(recipientData[pincode] || {}),
+    );
+
+    return allRecipientsComplete && receiptFile;
+  };
+
   const handleSameAsAbove = (currentPincode, previousPincode, checked) => {
     if (!checked) {
       setRecipientData((prev) => ({
@@ -164,6 +172,7 @@ export default function CheckoutPage() {
   };
 
   const recipientsComplete = areAllRecipientsComplete();
+  const checkoutReady = isCheckoutReady();
 
   return (
     <div className="checkout-page">
@@ -365,7 +374,17 @@ export default function CheckoutPage() {
         </div>
       </div>
       <div className="checkout-footer">
-        <button className="place-order-btn" onClick={handlePlaceOrder}>
+        {!checkoutReady && (
+          <div className="checkout-warning">
+            Complete recipient details and upload payment receipt to enable
+            Place Order.
+          </div>
+        )}
+        <button
+          className="place-order-btn"
+          disabled={!checkoutReady}
+          onClick={handlePlaceOrder}
+        >
           Place Order
         </button>
       </div>

@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart, loading } = useCart();
   const [localQty, setLocalQty] = useState({});
   const [pending, setPending] = useState({});
   const timersRef = useRef({});
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const next = {};
@@ -72,6 +75,8 @@ export default function CartPage() {
     groups.get(key).push(item);
     return groups;
   }, new Map());
+
+  const checkoutLink = user ? "/checkout" : "/login";
 
   return (
     <div className="page cart-page">
@@ -208,7 +213,7 @@ export default function CartPage() {
               Clear Cart
             </button>
             <strong>Order Total: Rs. {total}</strong>
-            <button className="primary" onClick={() => navigate("/checkout")}>
+            <button className="primary" onClick={() => navigate(checkoutLink)}>
               Checkout
             </button>
             <Link to="/checkout">
