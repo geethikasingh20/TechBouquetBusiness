@@ -2,6 +2,10 @@ package com.techbouquet.customer;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.techbouquet.address.Address;
 
 @Entity
 @Table(name = "customers")
@@ -39,6 +43,13 @@ public class Customer {
     private Instant createdAt = Instant.now();
 
     private Instant lastLoginAt;
+
+    @OneToMany(
+    mappedBy = "customer",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true)
+    private List<Address> addresses = new ArrayList<>();
+    
 
     public Long getId() {
         return id;
@@ -135,4 +146,14 @@ public class Customer {
     public void setLastLoginAt(Instant lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    
 }

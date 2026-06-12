@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/CheckoutPageStyleNew.css";
-
+import { saveAddress } from "../data/api";
+import { useAuth } from "../context/AuthContext";
 export default function CheckoutPage() {
   const { items } = useCart();
-
+  const { user, profile } = useAuth();
   const groupedItems = useMemo(() => {
     return items.reduce((groups, item) => {
       const key = item.deliveryPincode?.trim() || "No Pincode";
@@ -58,13 +59,14 @@ export default function CheckoutPage() {
     if (data?.saveAddress && !data?.label?.trim()) {
       errors.label = "Address label is required";
     }
+    console.log(` error ${JSON.stringify(errors)}`);
     return errors;
   };
 
   const areAllRecipientsComplete = () => {
     for (const pincode of Object.keys(groupedItems)) {
       const result = validateRecipient(recipientData[pincode] || {});
-
+      console.log(`result ${result}`);
       if (Object.keys(result).length > 0) {
         return false;
       }
@@ -73,7 +75,7 @@ export default function CheckoutPage() {
     return true;
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!items.length) {
       alert("Cart is empty");
       return;
@@ -105,6 +107,26 @@ export default function CheckoutPage() {
     console.log("recipientData =", recipientData);
     console.log("groupedItems =", groupedItems);
     alert("Validation successful");
+
+    for (const pincode of Object.keys(recipientData)) {
+      const recipient = recipientData[pincode];
+
+      if (recipient.saveAddress) {
+        await saveAddress(
+          {
+            customerId: profile.id,
+            label: recipient.label,
+            recipientName: recipient.name,
+            recipientPhone: recipient.phone,
+            line1: recipient.line1,
+            line2: recipient.line2,
+            line3: recipient.line3,
+            pincode,
+          },
+          user.token,
+        );
+      }
+    }
   };
   const isRecipientComplete = (data = {}) => {
     return (
@@ -119,7 +141,9 @@ export default function CheckoutPage() {
     const allRecipientsComplete = Object.keys(groupedItems).every((pincode) =>
       isRecipientComplete(recipientData[pincode] || {}),
     );
-
+    console.log(
+      `allRecipientsComplete  ${allRecipientsComplete} receiptFile ${receiptFile}`,
+    );
     return allRecipientsComplete && receiptFile;
   };
 

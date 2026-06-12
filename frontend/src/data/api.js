@@ -10,8 +10,8 @@ export async function apiFetch(path, options = {}) {
     ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...headers
-    }
+      ...headers,
+    },
   });
 
   if (!response.ok) {
@@ -26,14 +26,14 @@ export async function apiFetch(path, options = {}) {
 export async function loginApi(payload) {
   return apiFetch("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }
 
 export async function registerApi(payload) {
   return apiFetch("/api/auth/register", {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }
 
@@ -41,16 +41,16 @@ export async function verifyEmailApi(token) {
   return apiFetch("/api/auth/verify-email", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 
 export async function fetchProfile(token) {
   return apiFetch("/api/profile/me", {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 
@@ -76,7 +76,10 @@ export function readProductsCache() {
 }
 
 export function writeProductsCache(items) {
-  localStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+  localStorage.setItem(
+    PRODUCTS_CACHE_KEY,
+    JSON.stringify({ ts: Date.now(), items }),
+  );
 }
 
 export function readProductsSummaryCache() {
@@ -93,7 +96,10 @@ export function readProductsSummaryCache() {
 }
 
 export function writeProductsSummaryCache(items) {
-  localStorage.setItem(PRODUCTS_SUMMARY_CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+  localStorage.setItem(
+    PRODUCTS_SUMMARY_CACHE_KEY,
+    JSON.stringify({ ts: Date.now(), items }),
+  );
 }
 
 export async function fetchProductsCached() {
@@ -133,8 +139,8 @@ export async function searchProducts(query) {
 export async function fetchCart(token) {
   return apiFetch("/api/cart", {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 
@@ -142,9 +148,9 @@ export async function addCartItem(token, payload) {
   return apiFetch("/api/cart/items", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 }
 
@@ -152,9 +158,9 @@ export async function updateCartItem(token, itemId, quantity) {
   return apiFetch(`/api/cart/items/${itemId}`, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ quantity })
+    body: JSON.stringify({ quantity }),
   });
 }
 
@@ -162,8 +168,8 @@ export async function removeCartItem(token, itemId) {
   return apiFetch(`/api/cart/items/${itemId}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 
@@ -171,7 +177,17 @@ export async function clearCartApi(token) {
   return apiFetch("/api/cart/clear", {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+export async function saveAddress(address, token) {
+  console.log("inside save address");
+  return apiFetch("/api/address", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(address),
   });
 }

@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { addCartItem, clearCartApi, fetchCart, removeCartItem, updateCartItem } from "../data/api";
+import {
+  addCartItem,
+  clearCartApi,
+  fetchCart,
+  removeCartItem,
+  updateCartItem,
+} from "../data/api";
 import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
@@ -21,8 +27,14 @@ function normalizePincode(value) {
 }
 
 function sameAddons(a, b) {
-  const left = normalizeAddons(a).map((addon) => String(addon?.id ?? "")).filter(Boolean).sort();
-  const right = normalizeAddons(b).map((addon) => String(addon?.id ?? "")).filter(Boolean).sort();
+  const left = normalizeAddons(a)
+    .map((addon) => String(addon?.id ?? ""))
+    .filter(Boolean)
+    .sort();
+  const right = normalizeAddons(b)
+    .map((addon) => String(addon?.id ?? ""))
+    .filter(Boolean)
+    .sort();
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
@@ -70,7 +82,9 @@ function cartOwner(user) {
 
 function getProductImageUrl(product) {
   if (!product) return "";
-  return product.imageUrl || product.images?.[0]?.url || product.images?.[0] || "";
+  return (
+    product.imageUrl || product.images?.[0]?.url || product.images?.[0] || ""
+  );
 }
 
 export function CartProvider({ children }) {
@@ -116,7 +130,7 @@ export function CartProvider({ children }) {
       const existing = prev.find(
         (item) =>
           item.productId === product.id &&
-          normalizePincode(item.deliveryPincode) === safePincode
+          normalizePincode(item.deliveryPincode) === safePincode,
       );
       if (existing) {
         const mergedAddons = mergeAddons(existing.addons, safeAddons);
@@ -126,7 +140,7 @@ export function CartProvider({ children }) {
             ? sameAddonSet
               ? { ...item, quantity: item.quantity + 1 }
               : { ...item, addons: mergedAddons }
-            : item
+            : item,
         );
         writeCache(owner, updated);
         return updated;
@@ -141,8 +155,8 @@ export function CartProvider({ children }) {
           quantity: 1,
           addons: safeAddons,
           imageUrl: getProductImageUrl(product),
-          deliveryPincode: safePincode
-        }
+          deliveryPincode: safePincode,
+        },
       ];
       writeCache(owner, updated);
       return updated;
@@ -156,7 +170,7 @@ export function CartProvider({ children }) {
       const data = await addCartItem(user.token, {
         productId: product.id,
         addonsJson: JSON.stringify(safeAddons),
-        deliveryPincode: safePincode
+        deliveryPincode: safePincode,
       });
       setItems(data);
       writeCache(owner, data);
@@ -171,7 +185,9 @@ export function CartProvider({ children }) {
   const updateQuantity = async (id, quantity) => {
     const owner = cartOwner(user);
     setItems((prev) => {
-      const updated = prev.map((item) => (item.id === id ? { ...item, quantity } : item));
+      const updated = prev.map((item) =>
+        item.id === id ? { ...item, quantity } : item,
+      );
       writeCache(owner, updated);
       return updated;
     });
@@ -226,7 +242,10 @@ export function CartProvider({ children }) {
     }
   };
 
-  const value = useMemo(() => ({ items, loading, addItem, updateQuantity, removeItem, clearCart }), [items, loading, user]);
+  const value = useMemo(
+    () => ({ items, loading, addItem, updateQuantity, removeItem, clearCart }),
+    [items, loading, user],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
