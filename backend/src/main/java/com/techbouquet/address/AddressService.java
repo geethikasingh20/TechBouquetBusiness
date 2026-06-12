@@ -2,8 +2,11 @@ package com.techbouquet.address;
 
 import com.techbouquet.customer.Customer;
 import com.techbouquet.customer.CustomerRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -16,9 +19,12 @@ public class AddressService {
         this.addressRepository = addressRepository;
     }
 
-    public AddressResponse saveAddress(AddressRequest request) {
+    public AddressResponse saveAddress(AddressRequest request, Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
 
-        Customer customer = customerRepository.findById(request.customerId())
+        Customer customer = customerRepository.findByEmail(principal.getName())
                 .orElseThrow(() ->
                         new RuntimeException("Customer not found"));
 
@@ -33,6 +39,8 @@ public class AddressService {
         address.setAddressLine1(request.line1());
         address.setAddressLine2(request.line2());
         address.setLandmark(request.line3());
+        address.setCity(request.city());
+        address.setState(request.state());
 
         address.setPincode(request.pincode());
 
@@ -49,6 +57,15 @@ public class AddressService {
                 .toList();
     }
 
+    public List<AddressResponse> getAddressesForPrincipal(Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        Customer customer = customerRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        return getAddresses(customer.getId());
+    }
+
     private AddressResponse mapToResponse(Address address) {
 
         return new AddressResponse(
@@ -59,6 +76,8 @@ public class AddressService {
                 address.getAddressLine1(),
                 address.getAddressLine2(),
                 address.getLandmark(),
+                address.getCity(),
+                address.getState(),
                 address.getPincode()
         );
     }

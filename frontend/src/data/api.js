@@ -1,3 +1,5 @@
+import { logAuthTrace } from "../components/dev/AuthDebug";
+
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 const PRODUCTS_CACHE_KEY = "techbouquet_products_cache";
 const PRODUCTS_SUMMARY_CACHE_KEY = "techbouquet_products_summary_cache";
@@ -5,7 +7,13 @@ const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
 let productsFetchPromise = null;
 
 export async function apiFetch(path, options = {}) {
-  const { headers = {}, ...rest } = options;
+  const {
+    headers = {},
+    authRedirectOn401 = false,
+    ...rest
+  } = options;
+  const authorization = headers.Authorization || headers.authorization || "";
+  logAuthTrace(path, authorization);
   const response = await fetch(`${API_BASE}${path}`, {
     ...rest,
     headers: {
@@ -16,6 +24,9 @@ export async function apiFetch(path, options = {}) {
 
   if (!response.ok) {
     const text = await response.text();
+    if (authRedirectOn401 && (response.status === 401 || response.status === 403)) {
+      window.dispatchEvent(new CustomEvent("techbouquet:auth-expired"));
+    }
     throw new Error(text || "Request failed");
   }
 
@@ -40,6 +51,7 @@ export async function registerApi(payload) {
 export async function verifyEmailApi(token) {
   return apiFetch("/api/auth/verify-email", {
     method: "POST",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -48,6 +60,16 @@ export async function verifyEmailApi(token) {
 
 export async function fetchProfile(token) {
   return apiFetch("/api/profile/me", {
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function fetchAddresses(token) {
+  return apiFetch("/api/address/me", {
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -138,6 +160,7 @@ export async function searchProducts(query) {
 
 export async function fetchCart(token) {
   return apiFetch("/api/cart", {
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -147,6 +170,7 @@ export async function fetchCart(token) {
 export async function addCartItem(token, payload) {
   return apiFetch("/api/cart/items", {
     method: "POST",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -157,6 +181,7 @@ export async function addCartItem(token, payload) {
 export async function updateCartItem(token, itemId, quantity) {
   return apiFetch(`/api/cart/items/${itemId}`, {
     method: "PATCH",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -167,6 +192,7 @@ export async function updateCartItem(token, itemId, quantity) {
 export async function removeCartItem(token, itemId) {
   return apiFetch(`/api/cart/items/${itemId}`, {
     method: "DELETE",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -176,15 +202,16 @@ export async function removeCartItem(token, itemId) {
 export async function clearCartApi(token) {
   return apiFetch("/api/cart/clear", {
     method: "DELETE",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 }
 export async function saveAddress(address, token) {
-  console.log("inside save address");
   return apiFetch("/api/address", {
     method: "POST",
+    authRedirectOn401: true,
     headers: {
       Authorization: `Bearer ${token}`,
     },

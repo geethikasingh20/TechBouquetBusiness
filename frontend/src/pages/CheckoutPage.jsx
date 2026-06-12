@@ -5,7 +5,7 @@ import { saveAddress } from "../data/api";
 import { useAuth } from "../context/AuthContext";
 export default function CheckoutPage() {
   const { items } = useCart();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const groupedItems = useMemo(() => {
     return items.reduce((groups, item) => {
       const key = item.deliveryPincode?.trim() || "No Pincode";
@@ -114,13 +114,14 @@ export default function CheckoutPage() {
       if (recipient.saveAddress) {
         await saveAddress(
           {
-            customerId: profile.id,
             label: recipient.label,
             recipientName: recipient.name,
             recipientPhone: recipient.phone,
             line1: recipient.line1,
             line2: recipient.line2,
             line3: recipient.line3,
+            city: recipient.city || "",
+            state: recipient.state || "",
             pincode,
           },
           user.token,

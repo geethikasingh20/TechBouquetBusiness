@@ -463,6 +463,56 @@ main {
   border: 1px solid #f4d9c2;
 }
 
+.address-book {
+  display: grid;
+  gap: 16px;
+}
+
+.address-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.address-card {
+  border: 1px solid #f4d9c2;
+  border-radius: 14px;
+  padding: 16px;
+  background: linear-gradient(180deg, #fff, #fff8f1);
+  display: grid;
+  gap: 8px;
+}
+
+.address-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.address-recipient {
+  margin: 0;
+  font-weight: 600;
+}
+
+.address-pincode {
+  background: #fff2e1;
+  border: 1px solid #f4d9c2;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a5e22;
+  white-space: nowrap;
+}
+
+.empty-state {
+  border: 1px dashed #e2c6aa;
+  border-radius: 14px;
+  padding: 20px;
+  background: #fffaf4;
+}
+
 @media (max-width: 760px) {
   .site-header {
     flex-direction: column;
@@ -478,6 +528,38 @@ main {
   color: #a72608;
   padding: 10px 14px;
   border-radius: 10px;
+}
+
+.session-expired-banner {
+  background: #eef6ff;
+  color: #1d4f91;
+  border: 1px solid #b8d4ff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 12px 0 0;
+}
+
+.auth-debug-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.auth-debug-pill.has-token {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #bfe3c4;
+}
+
+.auth-debug-pill.no-token {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
 }
 .qty-control {
   display: flex;

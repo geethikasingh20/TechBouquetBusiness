@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { loginApi, verifyEmailApi } from "../data/api";
 
@@ -8,7 +8,9 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [resetEmail, setResetEmail] = useState("");
   const [error, setError] = useState("");
+  const location = useLocation();
   const navigate = useNavigate();
+  const sessionExpired = location.state?.reason === "session-expired";
 
   useEffect(() => {
     if (user?.token) {
@@ -54,6 +56,11 @@ export default function LoginPage() {
   return (
     <div className="page auth-page">
       <h2>Login</h2>
+      {sessionExpired && (
+        <p className="session-expired-banner">
+          Your session expired. Please log in again.
+        </p>
+      )}
       {error && <p className="error">{error}</p>}
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>

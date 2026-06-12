@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { AuthDebugBadge } from "./dev/AuthDebug";
 import avatarImage from "../assets/avtar-yellow.avif";
 import logoImage from "../assets/logoImage.png";
 import tokriImage from "../assets/tokri.png";
@@ -236,6 +237,7 @@ export default function Header() {
       </div>
       <SearchBar />
       <div className="header-actions">
+        <AuthDebugBadge token={user?.token} />
         {!user && !loggingOut && (
           <button className="primary" onClick={() => navigate("/register")}>Register</button>
         )}

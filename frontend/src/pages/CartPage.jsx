@@ -43,6 +43,7 @@ export default function CartPage() {
     if (safeValue <= 0) {
       if (timersRef.current[id]) {
         clearTimeout(timersRef.current[id]);
+        delete timersRef.current[id];
       }
       removeItem(id).finally(() => {
         setPending((prev) => ({ ...prev, [id]: false }));
@@ -55,14 +56,17 @@ export default function CartPage() {
     }
     timersRef.current[id] = setTimeout(async () => {
       const start = Date.now();
-      await updateQuantity(id, safeValue);
-      const elapsed = Date.now() - start;
-      const waitMs = Math.max(0, 250 - elapsed);
-      if (waitMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      try {
+        await updateQuantity(id, safeValue);
+        const elapsed = Date.now() - start;
+        const waitMs = Math.max(0, 250 - elapsed);
+        if (waitMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
+        }
+      } finally {
+        setPending((prev) => ({ ...prev, [id]: false }));
+        delete timersRef.current[id];
       }
-      setPending((prev) => ({ ...prev, [id]: false }));
-      delete timersRef.current[id];
     }, 400);
   };
 

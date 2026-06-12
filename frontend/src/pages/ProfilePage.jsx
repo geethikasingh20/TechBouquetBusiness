@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { fetchAddresses } from "../data/api";
 
 const sections = [
   "My Profile",
@@ -13,6 +14,9 @@ const sections = [
 
 export default function ProfilePage() {
   const [active, setActive] = useState(sections[0]);
+  const [addresses, setAddresses] = useState([]);
+  const [addressesLoading, setAddressesLoading] = useState(false);
+  const [addressesError, setAddressesError] = useState("");
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
@@ -21,6 +25,29 @@ export default function ProfilePage() {
       navigate("/login");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    const loadAddresses = async () => {
+      if (!user?.token || active !== "My Addresses") {
+        return;
+      }
+
+      setAddressesLoading(true);
+      setAddressesError("");
+
+      try {
+        const data = await fetchAddresses(user.token);
+        setAddresses(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setAddresses([]);
+        setAddressesError(error.message || "Failed to load saved addresses");
+      } finally {
+        setAddressesLoading(false);
+      }
+    };
+
+    loadAddresses();
+  }, [active, user?.token]);
 
   const isVerified = !!profile?.emailVerified;
 
@@ -70,7 +97,50 @@ export default function ProfilePage() {
             <button className="ghost">Edit Details</button>
           </div>
         )}
-        {active !== "My Profile" && (
+        {active === "My Addresses" && (
+          <div className="address-book">
+            {addressesLoading && <p>Loading saved addresses...</p>}
+            {!addressesLoading && addressesError && (
+              <p className="field-error">{addressesError}</p>
+            )}
+            {!addressesLoading && !addressesError && addresses.length === 0 && (
+              <div className="empty-state">
+                <h3>No saved addresses yet</h3>
+                <p>Saved addresses from checkout will appear here.</p>
+              </div>
+            )}
+            {!addressesLoading && addresses.length > 0 && (
+              <div className="address-grid">
+                {addresses.map((address) => (
+                  <article key={address.id} className="address-card">
+                    <div className="address-card-head">
+                      <strong>{address.label || "Saved Address"}</strong>
+                      <span className="address-pincode">
+                        {address.pincode}
+                      </span>
+                    </div>
+                    <p className="address-recipient">
+                      {address.recipientName}
+                    </p>
+                    <p>
+                      {address.line1}
+                      {address.line2 ? `, ${address.line2}` : ""}
+                      {address.line3 ? `, ${address.line3}` : ""}
+                    </p>
+                    {(address.city || address.state) && (
+                      <p>
+                        {address.city}
+                        {address.city && address.state ? ", " : ""}
+                        {address.state}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {active !== "My Profile" && active !== "My Addresses" && (
           <p>Content for {active} will appear here.</p>
         )}
       </section>

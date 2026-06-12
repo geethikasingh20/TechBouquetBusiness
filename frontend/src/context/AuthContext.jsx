@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchProfile } from "../data/api";
 
 const AuthContext = createContext();
@@ -6,6 +7,7 @@ const AuthContext = createContext();
 const AUTH_KEY = "techbouquet_auth";
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem(AUTH_KEY);
     return stored ? JSON.parse(stored) : null;
@@ -36,6 +38,23 @@ export function AuthProvider({ children }) {
     loadProfile();
   }, [user]);
 
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      localStorage.removeItem(AUTH_KEY);
+      setUser(null);
+      setProfile(null);
+      navigate("/login", {
+        replace: true,
+        state: { reason: "session-expired" },
+      });
+    };
+
+    window.addEventListener("techbouquet:auth-expired", handleAuthExpired);
+    return () => {
+      window.removeEventListener("techbouquet:auth-expired", handleAuthExpired);
+    };
+  }, [navigate]);
+
   const login = (payload) => {
     setUser(payload);
   };
@@ -44,6 +63,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(AUTH_KEY);
     setUser(null);
     setProfile(null);
+    navigate("/login", { replace: true });
   };
 
   const verifyEmail = () => {

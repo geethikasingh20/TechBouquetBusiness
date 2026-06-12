@@ -1,36 +1,32 @@
 package com.techbouquet.address;
 
 
-import org.springframework.http.ResponseEntity;
-
-import com.techbouquet.customer.Customer;
-import com.techbouquet.customer.CustomerRepository;
-
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/api/address")
-public class AddressController {  
-        
-        private final AddressService addressService;
+public class AddressController {
+    private final AddressService addressService;
 
-        public AddressController(AddressService addressService) {
+    public AddressController(AddressService addressService) {
         this.addressService = addressService;
     }
-    
+
     @PostMapping
     public AddressResponse saveAddress(
-            @RequestBody AddressRequest request) {
+            @RequestBody AddressRequest request,
+            Principal principal) {
 
-        return addressService.saveAddress(request);
+        return addressService.saveAddress(request, principal);
+    }
+
+    @GetMapping("/me")
+    public List<AddressResponse> getMyAddresses(Principal principal) {
+        return addressService.getAddressesForPrincipal(principal);
     }
 
     @GetMapping("/{customerId}")
