@@ -28,10 +28,18 @@ public class AddressService {
                 .orElseThrow(() ->
                         new RuntimeException("Customer not found"));
 
+        String label = request.label() == null ? "" : request.label().trim();
+        if (label.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address label is required");
+        }
+        if (addressRepository.existsByCustomerIdAndLabel(customer.getId(), label)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Address label must be unique");
+        }
+
         Address address = new Address();
 
         address.setCustomer(customer);
-        address.setLabel(request.label());
+        address.setLabel(label);
 
         address.setRecipientName(request.recipientName());
         address.setPhone(request.recipientPhone());
@@ -51,10 +59,14 @@ public class AddressService {
 
     public List<AddressResponse> getAddresses(Long customerId) {
 
-        return addressRepository.findByCustomerId(customerId)
+        List<AddressResponse> add= addressRepository.findByCustomerId(customerId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+         for(AddressResponse a: add){
+            System.out.println(a.label() + " --- " + a.recipientName());
+         }       
+        return add;
     }
 
     public List<AddressResponse> getAddressesForPrincipal(Principal principal) {

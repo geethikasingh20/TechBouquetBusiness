@@ -7,7 +7,12 @@ import com.techbouquet.customer.Customer;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "addresses")
+@Table(
+        name = "addresses",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_addresses_customer_label", columnNames = {"customer_id", "label"})
+        }
+)
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

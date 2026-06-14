@@ -9,7 +9,7 @@ const sections = [
   "My Orders",
   "Favourite Moments",
   "Transactions",
-  "Settings"
+  "Settings",
 ];
 
 export default function ProfilePage() {
@@ -37,6 +37,7 @@ export default function ProfilePage() {
 
       try {
         const data = await fetchAddresses(user.token);
+        console.log(`inside data ${data}`);
         setAddresses(Array.isArray(data) ? data : []);
       } catch (error) {
         setAddresses([]);
@@ -68,10 +69,14 @@ export default function ProfilePage() {
         <h2>{active}</h2>
         {active === "My Profile" && (
           <div className="profile-details">
-            <p><strong>Full Name:</strong> {profile?.name || ""}</p>
+            <p>
+              <strong>Full Name:</strong> {profile?.name || ""}
+            </p>
             <p>
               <strong>Email:</strong> {profile?.email || ""}
-              <span className={isVerified ? "verified-badge" : "unverified-badge"}>
+              <span
+                className={isVerified ? "verified-badge" : "unverified-badge"}
+              >
                 {isVerified ? (
                   <>
                     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -89,11 +94,21 @@ export default function ProfilePage() {
                 )}
               </span>
             </p>
-            <p><strong>Phone Number:</strong> {profile?.phoneNumber || ""}</p>
-            <p><strong>Zodiac Sign:</strong> </p>
-            <p><strong>Date of Birth:</strong> </p>
-            <p><strong>Gender:</strong> </p>
-            <p><strong>Primary Address:</strong> </p>
+            <p>
+              <strong>Phone Number:</strong> {profile?.phoneNumber || ""}
+            </p>
+            <p>
+              <strong>Zodiac Sign:</strong>{" "}
+            </p>
+            <p>
+              <strong>Date of Birth:</strong>{" "}
+            </p>
+            <p>
+              <strong>Gender:</strong>{" "}
+            </p>
+            <p>
+              <strong>Primary Address:</strong>{" "}
+            </p>
             <button className="ghost">Edit Details</button>
           </div>
         )}
@@ -115,13 +130,9 @@ export default function ProfilePage() {
                   <article key={address.id} className="address-card">
                     <div className="address-card-head">
                       <strong>{address.label || "Saved Address"}</strong>
-                      <span className="address-pincode">
-                        {address.pincode}
-                      </span>
+                      <span className="address-pincode">{address.pincode}</span>
                     </div>
-                    <p className="address-recipient">
-                      {address.recipientName}
-                    </p>
+                    <p className="address-recipient">{address.recipientName}</p>
                     <p>
                       {address.line1}
                       {address.line2 ? `, ${address.line2}` : ""}

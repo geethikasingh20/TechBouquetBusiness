@@ -63,6 +63,33 @@ export default function CheckoutPage() {
     return errors;
   };
 
+  const validateUniqueSaveLabels = () => {
+    const seen = new Map();
+    const duplicateErrors = {};
+
+    for (const [pincode, recipient] of Object.entries(recipientData)) {
+      if (!recipient?.saveAddress) continue;
+      const labelKey = recipient.label?.trim();
+      if (!labelKey) continue;
+
+      if (seen.has(labelKey)) {
+        duplicateErrors[pincode] = {
+          ...(duplicateErrors[pincode] || {}),
+          label: "Address label must be unique",
+        };
+        const otherPincode = seen.get(labelKey);
+        duplicateErrors[otherPincode] = {
+          ...(duplicateErrors[otherPincode] || {}),
+          label: "Address label must be unique",
+        };
+      } else {
+        seen.set(labelKey, pincode);
+      }
+    }
+
+    return duplicateErrors;
+  };
+
   const areAllRecipientsComplete = () => {
     for (const pincode of Object.keys(groupedItems)) {
       const result = validateRecipient(recipientData[pincode] || {});
@@ -90,6 +117,14 @@ export default function CheckoutPage() {
       }
     }
 
+    const duplicateLabelErrors = validateUniqueSaveLabels();
+    for (const [pincode, result] of Object.entries(duplicateLabelErrors)) {
+      validationErrors[pincode] = {
+        ...(validationErrors[pincode] || {}),
+        ...result,
+      };
+    }
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
 
@@ -112,20 +147,34 @@ export default function CheckoutPage() {
       const recipient = recipientData[pincode];
 
       if (recipient.saveAddress) {
-        await saveAddress(
-          {
-            label: recipient.label,
-            recipientName: recipient.name,
-            recipientPhone: recipient.phone,
-            line1: recipient.line1,
-            line2: recipient.line2,
-            line3: recipient.line3,
-            city: recipient.city || "",
-            state: recipient.state || "",
-            pincode,
-          },
-          user.token,
-        );
+        try {
+          await saveAddress(
+            {
+              label: recipient.label,
+              recipientName: recipient.name,
+              recipientPhone: recipient.phone,
+              line1: recipient.line1,
+              line2: recipient.line2,
+              line3: recipient.line3,
+              city: recipient.city || "",
+              state: recipient.state || "",
+              pincode,
+            },
+            user.token,
+          );
+        } catch (error) {
+          setErrors((prev) => ({
+            ...prev,
+            [pincode]: {
+              ...(prev[pincode] || {}),
+              label:
+                error.message === "Address label must be unique"
+                  ? error.message
+                  : error.message || "Failed to save address",
+            },
+          }));
+          return;
+        }
       }
     }
   };
@@ -153,7 +202,9 @@ export default function CheckoutPage() {
       setRecipientData((prev) => ({
         ...prev,
         [currentPincode]: {
+          ...(prev[currentPincode] || {}),
           sameAsAbove: false,
+          saveAddress: false,
         },
       }));
 
@@ -167,6 +218,8 @@ export default function CheckoutPage() {
       [currentPincode]: {
         ...previousData,
         sameAsAbove: true,
+        saveAddress: false,
+        label: "",
       },
     }));
   };
@@ -298,22 +351,25 @@ export default function CheckoutPage() {
                 }
               />
 
-              <label>
-                <input
-                  className="save-address-row"
-                  disabled={copied}
-                  type="checkbox"
-                  checked={recipientData[pincode]?.saveAddress || false}
-                  onChange={(e) =>
-                    updateRecipient(pincode, "saveAddress", e.target.checked)
-                  }
-                />
-                Save this address
-              </label>
-              {errors[pincode]?.label && (
-                <div className="field-error">{errors[pincode].label}</div>
+              {!copied && (
+                <>
+                  <label>
+                    <input
+                      className="save-address-row"
+                      type="checkbox"
+                      checked={recipientData[pincode]?.saveAddress || false}
+                      onChange={(e) =>
+                        updateRecipient(pincode, "saveAddress", e.target.checked)
+                      }
+                    />
+                    Save this address
+                  </label>
+                  {errors[pincode]?.label && (
+                    <div className="field-error">{errors[pincode].label}</div>
+                  )}
+                </>
               )}
-              {recipientData[pincode]?.saveAddress && (
+              {!copied && recipientData[pincode]?.saveAddress && (
                 <input
                   placeholder="Address Label (Home, Office, Mom)"
                   value={recipientData[pincode]?.label || ""}

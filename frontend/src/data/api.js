@@ -27,7 +27,14 @@ export async function apiFetch(path, options = {}) {
     if (authRedirectOn401 && (response.status === 401 || response.status === 403)) {
       window.dispatchEvent(new CustomEvent("techbouquet:auth-expired"));
     }
-    throw new Error(text || "Request failed");
+    let message = text || "Request failed";
+    try {
+      const parsed = JSON.parse(text);
+      message = parsed?.message || parsed?.error || message;
+    } catch {
+      // Keep the raw response text when it is not JSON.
+    }
+    throw new Error(message);
   }
 
   if (response.status === 204) return null;
