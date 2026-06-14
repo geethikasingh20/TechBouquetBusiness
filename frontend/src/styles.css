@@ -539,6 +539,50 @@ main {
   margin: 12px 0 0;
 }
 
+.save-address-label-block {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.saved-address-picker {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.saved-address-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2c6aa;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.save-address-label-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a4335;
+}
+
+.save-address-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.save-address-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e2c6aa;
+  border-radius: 999px;
+  background: #fffaf5;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .auth-debug-pill {
   display: inline-flex;
   align-items: center;

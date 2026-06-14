@@ -1,11 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/CheckoutPageStyleNew.css";
-import { saveAddress } from "../data/api";
+import { fetchAddresses, saveAddress } from "../data/api";
 import { useAuth } from "../context/AuthContext";
 export default function CheckoutPage() {
   const { items } = useCart();
   const { user } = useAuth();
+  const addressLabelOptions = ["Home", "Office", "Mom", "Friend"];
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [savedAddressesLoading, setSavedAddressesLoading] = useState(false);
+  const [savedAddressesError, setSavedAddressesError] = useState("");
+  const [selectedSavedAddressByPincode, setSelectedSavedAddressByPincode] =
+    useState({});
   const groupedItems = useMemo(() => {
     return items.reduce((groups, item) => {
       const key = item.deliveryPincode?.trim() || "No Pincode";
@@ -28,6 +34,44 @@ export default function CheckoutPage() {
   );
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptError, setReceiptError] = useState("");
+
+  useEffect(() => {
+    const loadSavedAddresses = async () => {
+      if (!user?.token) {
+        setSavedAddresses([]);
+        return;
+      }
+
+      setSavedAddressesLoading(true);
+      setSavedAddressesError("");
+
+      try {
+        const data = await fetchAddresses(user.token);
+        setSavedAddresses(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setSavedAddresses([]);
+        setSavedAddressesError(
+          error.message || "Failed to load saved addresses",
+        );
+      } finally {
+        setSavedAddressesLoading(false);
+      }
+    };
+
+    loadSavedAddresses();
+  }, [user?.token]);
+
+  const savedAddressesByPincode = useMemo(() => {
+    return savedAddresses.reduce((groups, address) => {
+      const key = address?.pincode?.trim();
+      if (!key) return groups;
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(address);
+      return groups;
+    }, {});
+  }, [savedAddresses]);
 
   const updateRecipient = (pincode, field, value) => {
     setRecipientData((prev) => ({
@@ -57,7 +101,7 @@ export default function CheckoutPage() {
       errors.line2 = "Address Line 2 is required";
     }
     if (data?.saveAddress && !data?.label?.trim()) {
-      errors.label = "Address label is required";
+      errors.label = "Address label is required when saving the address";
     }
     console.log(` error ${JSON.stringify(errors)}`);
     return errors;
@@ -205,21 +249,69 @@ export default function CheckoutPage() {
           ...(prev[currentPincode] || {}),
           sameAsAbove: false,
           saveAddress: false,
+          label: "",
         },
+      }));
+      setSelectedSavedAddressByPincode((prev) => ({
+        ...prev,
+        [currentPincode]: "",
       }));
 
       return;
     }
 
     const previousData = recipientData[previousPincode];
+    const copiedContact = {
+      name: previousData?.name || "",
+      phone: previousData?.phone || "",
+    };
 
     setRecipientData((prev) => ({
       ...prev,
       [currentPincode]: {
-        ...previousData,
+        ...copiedContact,
         sameAsAbove: true,
         saveAddress: false,
         label: "",
+        line1: "",
+        line2: "",
+        line3: "",
+        city: "",
+        state: "",
+      },
+    }));
+    setSelectedSavedAddressByPincode((prev) => ({
+      ...prev,
+      [currentPincode]: "",
+    }));
+  };
+
+  const applySavedAddress = (pincode, addressId) => {
+    const chosenAddress = (savedAddressesByPincode[pincode] || []).find(
+      (address) => String(address.id) === String(addressId),
+    );
+
+    if (!chosenAddress) return;
+
+    setSelectedSavedAddressByPincode((prev) => ({
+      ...prev,
+      [pincode]: String(chosenAddress.id),
+    }));
+
+    setRecipientData((prev) => ({
+      ...prev,
+      [pincode]: {
+        ...(prev[pincode] || {}),
+        sameAsAbove: false,
+        saveAddress: false,
+        label: "",
+        name: chosenAddress.recipientName || "",
+        phone: chosenAddress.recipientPhone || "",
+        line1: chosenAddress.line1 || "",
+        line2: chosenAddress.line2 || "",
+        line3: chosenAddress.line3 || "",
+        city: chosenAddress.city || "",
+        state: chosenAddress.state || "",
       },
     }));
   };
@@ -255,10 +347,14 @@ export default function CheckoutPage() {
   return (
     <div className="checkout-page">
       <h2>Checkout</h2>
+      {savedAddressesError && (
+        <div className="field-error">{savedAddressesError}</div>
+      )}
 
       {Object.entries(groupedItems).map(([pincode, cartItems], index) => {
         const previousPincode = Object.keys(groupedItems)[index - 1];
         const copied = recipientData[pincode]?.sameAsAbove;
+        const pincodeSavedAddresses = savedAddressesByPincode[pincode] || [];
         const groupTotal = cartItems.reduce(
           (sum, item) => sum + item.price * item.quantity,
           0,
@@ -269,6 +365,29 @@ export default function CheckoutPage() {
             <h3 className="checkout-pincode">Delivery Pincode: {pincode}</h3>
 
             <div className="recipient-card">
+              <div className="saved-address-picker">
+                <div className="save-address-label-title">
+                  Use an address from your address book
+                </div>
+                {savedAddressesLoading ? (
+                  <small>Loading saved addresses...</small>
+                ) : pincodeSavedAddresses.length > 0 ? (
+                  <select
+                    className="saved-address-select"
+                    value={selectedSavedAddressByPincode[pincode] || ""}
+                    onChange={(e) => applySavedAddress(pincode, e.target.value)}
+                  >
+                    <option value="">Select a saved address</option>
+                    {pincodeSavedAddresses.map((address) => (
+                      <option key={address.id} value={address.id}>
+                        {address.label} - {address.recipientName}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <small>No saved addresses for this pincode yet.</small>
+                )}
+              </div>
               {index > 0 && (
                 <label className="same-as-above-row">
                   <input
@@ -285,7 +404,7 @@ export default function CheckoutPage() {
                       )
                     }
                   />
-                  Same as previous recipient ({previousPincode})
+                  Same contact details as previous recipient ({previousPincode})
                 </label>
               )}
               <h4>Recipient Details</h4>
@@ -319,7 +438,6 @@ export default function CheckoutPage() {
               )}
               <input
                 className="full-width"
-                disabled={copied}
                 placeholder="Address Line 1 (Flat / House No, Building)"
                 value={recipientData[pincode]?.line1 || ""}
                 onChange={(e) =>
@@ -331,7 +449,6 @@ export default function CheckoutPage() {
               )}
               <input
                 className="full-width"
-                disabled={copied}
                 placeholder="Address Line 2 (Apartment, Area, Street)"
                 value={recipientData[pincode]?.line2 || ""}
                 onChange={(e) =>
@@ -343,40 +460,56 @@ export default function CheckoutPage() {
               )}
               <input
                 className="full-width"
-                disabled={copied}
                 placeholder="Address Line 3 (Landmark)"
                 value={recipientData[pincode]?.line3 || ""}
                 onChange={(e) =>
                   updateRecipient(pincode, "line3", e.target.value)
                 }
               />
-
-              {!copied && (
+              {!selectedSavedAddressByPincode[pincode] && (
                 <>
-                  <label>
-                    <input
-                      className="save-address-row"
-                      type="checkbox"
-                      checked={recipientData[pincode]?.saveAddress || false}
-                      onChange={(e) =>
-                        updateRecipient(pincode, "saveAddress", e.target.checked)
-                      }
-                    />
-                    Save this address
-                  </label>
+                  <div className="save-address-label-title">Save address</div>
+                  <div className="save-address-label-block">
+                    <div className="save-address-label-title">
+                      Choose label for saved address
+                    </div>
+                    <div className="save-address-options">
+                      {addressLabelOptions.map((option) => (
+                        <label key={option} className="save-address-option">
+                          <input
+                            type="radio"
+                            name={`address-label-${pincode}`}
+                            value={option}
+                            checked={recipientData[pincode]?.label === option}
+                            onChange={(e) =>
+                              setRecipientData((prev) => ({
+                                ...prev,
+                                [pincode]: {
+                                  ...prev[pincode],
+                                  label: e.target.value,
+                                  saveAddress: true,
+                                },
+                              }))
+                            }
+                          />
+                          {option}
+                        </label>
+                      ))}
+                    </div>
+                    <small>
+                      Select one of the common labels to save this address.
+                    </small>
+                  </div>
                   {errors[pincode]?.label && (
                     <div className="field-error">{errors[pincode].label}</div>
                   )}
                 </>
               )}
-              {!copied && recipientData[pincode]?.saveAddress && (
-                <input
-                  placeholder="Address Label (Home, Office, Mom)"
-                  value={recipientData[pincode]?.label || ""}
-                  onChange={(e) =>
-                    updateRecipient(pincode, "label", e.target.value)
-                  }
-                />
+              {selectedSavedAddressByPincode[pincode] && (
+                <small>
+                  Loaded from saved address book. You can edit any field before
+                  placing the order.
+                </small>
               )}
             </div>
 
