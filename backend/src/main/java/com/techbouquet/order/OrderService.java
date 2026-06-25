@@ -2,7 +2,6 @@ package com.techbouquet.order;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.techbouquet.address.AddressService;
 import com.techbouquet.cart.Cart;
 import com.techbouquet.cart.CartAddon;
 import com.techbouquet.cart.CartItem;
@@ -46,7 +45,6 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
     private final ObjectMapper objectMapper;
-    private final AddressService addressService;
     private final Path storageRoot;
 
     public OrderService(CustomerRepository customerRepository,
@@ -54,14 +52,12 @@ public class OrderService {
                         CartItemRepository cartItemRepository,
                         OrderRepository orderRepository,
                         ObjectMapper objectMapper,
-                        AddressService addressService,
                         @Value("${app.order.storage-dir:uploads/orders}") String storageDir) {
         this.customerRepository = customerRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
         this.objectMapper = objectMapper;
-        this.addressService = addressService;
         this.storageRoot = Path.of(storageDir).toAbsolutePath().normalize();
     }
 
@@ -116,6 +112,12 @@ public class OrderService {
         return toResponse(order);
     }
 
+    public OrderResponse getOrderByNumber(String orderNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        return toResponse(order);
+    }
+
     @Transactional
     public OrderResponse updateOrderStatus(String orderNumber, OrderStatus status) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
@@ -129,6 +131,16 @@ public class OrderService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required"));
         Order order = orderRepository.findByOrderNumberAndCustomer(orderNumber, customer)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        return loadReceipt(order);
+    }
+
+    public ResponseEntity<Resource> loadReceiptForOrder(String orderNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        return loadReceipt(order);
+    }
+
+    private ResponseEntity<Resource> loadReceipt(Order order) {
         if (order.getReceiptPath() == null || order.getReceiptPath().isBlank()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Receipt not found");
         }

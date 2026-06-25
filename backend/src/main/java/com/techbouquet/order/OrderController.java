@@ -46,6 +46,18 @@ public class OrderController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{orderNumber}/admin")
+    public OrderResponse adminOrderDetails(@PathVariable String orderNumber) {
+        return orderService.getOrderByNumber(orderNumber);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{orderNumber}/receipt/admin")
+    public ResponseEntity<?> adminReceipt(@PathVariable String orderNumber) {
+        return orderService.loadReceiptForOrder(orderNumber);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{orderNumber}/status/{status}")
     public OrderResponse updateStatus(@PathVariable String orderNumber,
                                       @PathVariable OrderStatus status) {

@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "../styles/CheckoutPageStyleNew.css";
-import { fetchAddresses, saveAddress } from "../data/api";
+import {
+  createOrder,
+  fetchAddresses,
+  orderReceiptUrl,
+  saveAddress,
+} from "../data/api";
 import { useAuth } from "../context/AuthContext";
 export default function CheckoutPage() {
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const addressLabelOptions = ["Home", "Office", "Mom", "Friend"];
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [savedAddressesLoading, setSavedAddressesLoading] = useState(false);
@@ -29,11 +36,29 @@ export default function CheckoutPage() {
   const [recipientData, setRecipientData] = useState({});
   const [errors, setErrors] = useState({});
   const orderTotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) =>
+      sum +
+      (Number(item.price || 0) +
+        (item.addons || []).reduce(
+          (addonSum, addon) => addonSum + Number(addon?.price || 0),
+          0,
+        )) *
+        Number(item.quantity || 0),
     0,
   );
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptError, setReceiptError] = useState("");
+  const [orderError, setOrderError] = useState("");
+  const [orderSuccess, setOrderSuccess] = useState(null);
+  const getAddonUnitTotal = (item) =>
+    (item.addons || []).reduce(
+      (sum, addon) => sum + Number(addon?.price || 0),
+      0,
+    );
+
+  const getLineTotal = (item) =>
+    (Number(item.price || 0) + getAddonUnitTotal(item)) *
+    Number(item.quantity || 0);
 
   useEffect(() => {
     const loadSavedAddresses = async () => {
@@ -147,8 +172,11 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
+    setOrderError("");
+    setOrderSuccess(null);
+
     if (!items.length) {
-      alert("Cart is empty");
+      setOrderError("Cart is empty");
       return;
     }
 
@@ -171,9 +199,7 @@ export default function CheckoutPage() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
-      alert("Please complete all recipient details before placing order.");
-
+      setOrderError("Please complete all recipient details before placing order.");
       return;
     }
     if (!receiptFile) {
@@ -185,7 +211,6 @@ export default function CheckoutPage() {
     console.log("Ready to place order");
     console.log("recipientData =", recipientData);
     console.log("groupedItems =", groupedItems);
-    alert("Validation successful");
 
     for (const pincode of Object.keys(recipientData)) {
       const recipient = recipientData[pincode];
@@ -220,6 +245,41 @@ export default function CheckoutPage() {
           return;
         }
       }
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append(
+        "checkoutData",
+        JSON.stringify({
+          recipients: Object.fromEntries(
+            Object.entries(recipientData).map(([pincode, recipient]) => [
+              pincode,
+              {
+                name: recipient?.name || "",
+                phone: recipient?.phone || "",
+                line1: recipient?.line1 || "",
+                line2: recipient?.line2 || "",
+                line3: recipient?.line3 || "",
+                city: recipient?.city || "",
+                state: recipient?.state || "",
+                sameAsAbove: !!recipient?.sameAsAbove,
+                saveAddress: !!recipient?.saveAddress,
+                label: recipient?.label || "",
+              },
+            ]),
+          ),
+        }),
+      );
+      formData.append("receipt", receiptFile);
+
+      const response = await createOrder(user.token, formData);
+      setOrderSuccess(response);
+      setReceiptFile(null);
+      setReceiptError("");
+      await clearCart();
+    } catch (error) {
+      setOrderError(error.message || "Failed to place order");
     }
   };
   const isRecipientComplete = (data = {}) => {
@@ -344,19 +404,66 @@ export default function CheckoutPage() {
   const recipientsComplete = areAllRecipientsComplete();
   const checkoutReady = isCheckoutReady();
 
+  if (orderSuccess) {
+    return (
+      <div className="checkout-page">
+        <h2>Checkout</h2>
+        <section className="checkout-section order-success-card">
+          <h3>Order placed successfully</h3>
+          <p>
+            Order Number: <strong>{orderSuccess.orderNumber}</strong>
+          </p>
+          <p>
+            Status: <strong>{orderSuccess.status}</strong>
+          </p>
+          <p>
+            Total Amount: <strong>Rs. {orderSuccess.totalAmount}</strong>
+          </p>
+          <p>
+            Placed At:{" "}
+            <strong>
+              {orderSuccess.createdAt
+                ? new Date(orderSuccess.createdAt).toLocaleString()
+                : ""}
+            </strong>
+          </p>
+          <p>
+            Receipt:{" "}
+            <a
+              href={orderReceiptUrl(orderSuccess.orderNumber)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View uploaded receipt
+            </a>
+          </p>
+          <div className="checkout-success-actions">
+            <button className="primary" onClick={() => navigate("/profile")}>
+              View Order History
+            </button>
+            <button className="ghost" onClick={() => navigate("/")}>
+              Continue Shopping
+            </button>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="checkout-page">
       <h2>Checkout</h2>
       {savedAddressesError && (
         <div className="field-error">{savedAddressesError}</div>
       )}
+      {orderError && <div className="field-error">{orderError}</div>}
 
       {Object.entries(groupedItems).map(([pincode, cartItems], index) => {
         const previousPincode = Object.keys(groupedItems)[index - 1];
         const copied = recipientData[pincode]?.sameAsAbove;
         const pincodeSavedAddresses = savedAddressesByPincode[pincode] || [];
         const groupTotal = cartItems.reduce(
-          (sum, item) => sum + item.price * item.quantity,
+          (sum, item) => sum + getLineTotal(item),
           0,
         );
 
@@ -520,7 +627,22 @@ export default function CheckoutPage() {
                 <div key={item.id} className="checkout-item-row">
                   <span>{item.name}</span>
                   <span>Qty: {item.quantity}</span>
-                  <span>Rs. {item.price * item.quantity}</span>
+                  <span>Rs. {item.price}</span>
+                  {item.addons?.length > 0 && (
+                    <span className="addons-line">
+                      Add-ons:{" "}
+                      {item.addons
+                        .map((addon) => `${addon.name} (Rs. ${addon.price})`)
+                        .join(", ")}
+                    </span>
+                  )}
+                  {item.addons?.length > 0 && (
+                    <span className="addons-line">
+                      Add-on subtotal: Rs.{" "}
+                      {getAddonUnitTotal(item) * Number(item.quantity || 0)}
+                    </span>
+                  )}
+                  <span>Line Total: Rs. {getLineTotal(item)}</span>
                 </div>
               ))}
               <div className="checkout-group-total">

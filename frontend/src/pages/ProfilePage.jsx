@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { fetchAddresses } from "../data/api";
+import { fetchAddresses, fetchOrders, orderReceiptUrl } from "../data/api";
 
 const sections = [
   "My Profile",
@@ -17,6 +17,9 @@ export default function ProfilePage() {
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [addressesError, setAddressesError] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState("");
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
@@ -48,6 +51,29 @@ export default function ProfilePage() {
     };
 
     loadAddresses();
+  }, [active, user?.token]);
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user?.token || active !== "My Orders") {
+        return;
+      }
+
+      setOrdersLoading(true);
+      setOrdersError("");
+
+      try {
+        const data = await fetchOrders(user.token);
+        setOrders(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setOrders([]);
+        setOrdersError(error.message || "Failed to load orders");
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
+    loadOrders();
   }, [active, user?.token]);
 
   const isVerified = !!profile?.emailVerified;
@@ -151,9 +177,88 @@ export default function ProfilePage() {
             )}
           </div>
         )}
-        {active !== "My Profile" && active !== "My Addresses" && (
-          <p>Content for {active} will appear here.</p>
+        {active === "My Orders" && (
+          <div className="order-history">
+            {ordersLoading && <p>Loading your orders...</p>}
+            {!ordersLoading && ordersError && (
+              <p className="field-error">{ordersError}</p>
+            )}
+            {!ordersLoading && !ordersError && orders.length === 0 && (
+              <div className="empty-state">
+                <h3>No orders yet</h3>
+                <p>Your placed orders will appear here.</p>
+              </div>
+            )}
+            {!ordersLoading &&
+              orders.length > 0 &&
+              orders.map((order) => {
+                const itemsByPincode = order.items.reduce((groups, item) => {
+                  const key = item.deliveryPincode || "No delivery pincode";
+                  if (!groups[key]) {
+                    groups[key] = [];
+                  }
+                  groups[key].push(item);
+                  return groups;
+                }, {});
+
+                return (
+                  <article key={order.orderNumber} className="order-card">
+                    <div className="order-card-head">
+                      <div>
+                        <strong>{order.orderNumber}</strong>
+                        <p>Placed on {new Date(order.createdAt).toLocaleString()}</p>
+                      </div>
+                      <div className="order-card-meta">
+                        <span className={`order-status order-status-${order.status.toLowerCase()}`}>
+                          {order.status}
+                        </span>
+                        <strong>Rs. {order.totalAmount}</strong>
+                      </div>
+                    </div>
+                    {order.receiptUrl && (
+                      <p>
+                        Receipt:{" "}
+                        <a
+                          href={
+                            order.receiptUrl.startsWith("/")
+                              ? orderReceiptUrl(order.orderNumber)
+                              : order.receiptUrl
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View receipt
+                        </a>
+                      </p>
+                    )}
+                    <div className="order-groups">
+                      {Object.entries(itemsByPincode).map(([pincode, items]) => (
+                        <div key={pincode} className="order-group">
+                          <div className="order-group-head">
+                            <strong>{`Deliver to ${pincode}`}</strong>
+                          </div>
+                          {items.map((item) => (
+                            <div key={item.id} className="order-item-row">
+                              <div className="order-item-main">
+                                <span>{item.productName}</span>
+                                <small>Qty: {item.quantity}</small>
+                              </div>
+                              <div className="order-item-pricing">
+                                <span>Rs. {item.lineTotal}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+                );
+              })}
+          </div>
         )}
+        {active !== "My Profile" &&
+          active !== "My Addresses" &&
+          active !== "My Orders" && <p>Content for {active} will appear here.</p>}
       </section>
     </div>
   );

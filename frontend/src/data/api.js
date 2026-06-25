@@ -14,10 +14,12 @@ export async function apiFetch(path, options = {}) {
   } = options;
   const authorization = headers.Authorization || headers.authorization || "";
   logAuthTrace(path, authorization);
+  const isFormData =
+    typeof FormData !== "undefined" && rest.body instanceof FormData;
   const response = await fetch(`${API_BASE}${path}`, {
     ...rest,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...headers,
     },
   });
@@ -224,4 +226,47 @@ export async function saveAddress(address, token) {
     },
     body: JSON.stringify(address),
   });
+}
+
+export async function createOrder(token, formData) {
+  return apiFetch("/api/orders", {
+    method: "POST",
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+}
+
+export async function fetchOrders(token) {
+  return apiFetch("/api/orders/me", {
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function fetchOrder(token, orderNumber) {
+  return apiFetch(`/api/orders/${orderNumber}`, {
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function updateOrderStatus(token, orderNumber, status) {
+  return apiFetch(`/api/orders/${orderNumber}/status/${status}`, {
+    method: "PATCH",
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export function orderReceiptUrl(orderNumber) {
+  return `${API_BASE}/api/orders/${orderNumber}/receipt`;
 }
