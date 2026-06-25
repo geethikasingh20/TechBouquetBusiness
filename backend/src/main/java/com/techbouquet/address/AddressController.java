@@ -24,6 +24,21 @@ public class AddressController {
         return addressService.saveAddress(request, principal);
     }
 
+    @PatchMapping("/{addressId}")
+    public AddressResponse updateAddress(
+            @PathVariable Long addressId,
+            @RequestBody AddressRequest request,
+            Principal principal) {
+        return addressService.updateAddress(addressId, request, principal);
+    }
+
+    @DeleteMapping("/{addressId}")
+    public void deleteAddress(
+            @PathVariable Long addressId,
+            Principal principal) {
+        addressService.deleteAddress(addressId, principal);
+    }
+
     @GetMapping("/me")
     public List<AddressResponse> getMyAddresses(Principal principal) {
         return addressService.getAddressesForPrincipal(principal);

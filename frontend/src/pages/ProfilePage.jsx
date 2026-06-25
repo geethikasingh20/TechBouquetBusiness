@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { fetchAddresses, fetchOrders, orderReceiptUrl } from "../data/api";
+import {
+  deleteAddress,
+  fetchAddresses,
+  fetchOrders,
+  orderReceiptUrl,
+  updateAddress,
+} from "../data/api";
 
 const sections = [
   "My Profile",
@@ -12,11 +18,53 @@ const sections = [
   "Settings",
 ];
 
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="M13.5 6.5l4 4" />
+    </svg>
+  );
+}
+
+function DeleteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16" />
+      <path d="M9 7V5h6v2" />
+      <path d="M7 7l1 13h8l1-13" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  );
+}
+
+function SaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12l4 4L19 6" />
+    </svg>
+  );
+}
+
+function CancelIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
 export default function ProfilePage() {
   const [active, setActive] = useState(sections[0]);
   const [addresses, setAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [addressesError, setAddressesError] = useState("");
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [editingLabel, setEditingLabel] = useState("");
+  const [addressActionMessage, setAddressActionMessage] = useState("");
+  const [addressActionError, setAddressActionError] = useState("");
+  const [busyAddressId, setBusyAddressId] = useState(null);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState("");
@@ -54,6 +102,13 @@ export default function ProfilePage() {
   }, [active, user?.token]);
 
   useEffect(() => {
+    setEditingAddressId(null);
+    setEditingLabel("");
+    setAddressActionMessage("");
+    setAddressActionError("");
+  }, [active]);
+
+  useEffect(() => {
     const loadOrders = async () => {
       if (!user?.token || active !== "My Orders") {
         return;
@@ -75,6 +130,84 @@ export default function ProfilePage() {
 
     loadOrders();
   }, [active, user?.token]);
+
+  const startEditAddress = (address) => {
+    setEditingAddressId(address.id);
+    setEditingLabel(address.label || "");
+    setAddressActionMessage("");
+    setAddressActionError("");
+  };
+
+  const cancelEditAddress = () => {
+    setEditingAddressId(null);
+    setEditingLabel("");
+  };
+
+  const saveEditedAddress = async (address) => {
+    if (!user?.token) return;
+    const nextLabel = editingLabel.trim();
+    if (!nextLabel) {
+      setAddressActionError("Address label is required");
+      return;
+    }
+
+    setBusyAddressId(address.id);
+    setAddressActionError("");
+    setAddressActionMessage("");
+
+    try {
+      const updated = await updateAddress(
+        address.id,
+        {
+          label: nextLabel,
+          recipientName: address.recipientName,
+          recipientPhone: address.recipientPhone,
+          line1: address.line1,
+          line2: address.line2,
+          line3: address.line3,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+        },
+        user.token,
+      );
+
+      setAddresses((prev) =>
+        prev.map((item) => (item.id === address.id ? updated : item)),
+      );
+
+      setAddressActionMessage("Address label updated.");
+      cancelEditAddress();
+    } catch (error) {
+      setAddressActionError(error.message || "Failed to update address");
+    } finally {
+      setBusyAddressId(null);
+    }
+  };
+
+  const removeAddress = async (addressId) => {
+    if (!user?.token) return;
+    if (!window.confirm("Delete this address?")) {
+      return;
+    }
+
+    setBusyAddressId(addressId);
+    setAddressActionError("");
+    setAddressActionMessage("");
+
+    try {
+      await deleteAddress(addressId, user.token);
+      setAddresses((prev) => prev.filter((address) => address.id !== addressId));
+      setAddressActionMessage("Address deleted.");
+      if (editingAddressId === addressId) {
+        cancelEditAddress();
+      }
+    } catch (error) {
+      setAddressActionError(error.message || "Failed to delete address");
+    } finally {
+      setBusyAddressId(null);
+    }
+  };
 
   const isVerified = !!profile?.emailVerified;
 
@@ -144,6 +277,12 @@ export default function ProfilePage() {
             {!addressesLoading && addressesError && (
               <p className="field-error">{addressesError}</p>
             )}
+            {!addressesLoading && addressActionError && (
+              <p className="field-error">{addressActionError}</p>
+            )}
+            {!addressesLoading && addressActionMessage && (
+              <p className="field-success">{addressActionMessage}</p>
+            )}
             {!addressesLoading && !addressesError && addresses.length === 0 && (
               <div className="empty-state">
                 <h3>No saved addresses yet</h3>
@@ -158,19 +297,81 @@ export default function ProfilePage() {
                       <strong>{address.label || "Saved Address"}</strong>
                       <span className="address-pincode">{address.pincode}</span>
                     </div>
-                    <p className="address-recipient">{address.recipientName}</p>
-                    <p>
-                      {address.line1}
-                      {address.line2 ? `, ${address.line2}` : ""}
-                      {address.line3 ? `, ${address.line3}` : ""}
-                    </p>
-                    {(address.city || address.state) && (
-                      <p>
-                        {address.city}
-                        {address.city && address.state ? ", " : ""}
-                        {address.state}
-                      </p>
+                    {editingAddressId === address.id ? (
+                      <div className="address-edit-form">
+                        <label>
+                          Label
+                          <input
+                            type="text"
+                            value={editingLabel}
+                            onChange={(e) => setEditingLabel(e.target.value)}
+                            placeholder="Home, Office, Mom..."
+                          />
+                        </label>
+                        <div className="address-edit-actions">
+                          <button
+                            type="button"
+                            className="icon-action icon-save"
+                            title="Save label"
+                            aria-label="Save label"
+                            disabled={busyAddressId === address.id}
+                            onClick={() => saveEditedAddress(address)}
+                          >
+                            <SaveIcon />
+                          </button>
+                          <button
+                            type="button"
+                            className="icon-action icon-cancel"
+                            title="Cancel edit"
+                            aria-label="Cancel edit"
+                            disabled={busyAddressId === address.id}
+                            onClick={cancelEditAddress}
+                          >
+                            <CancelIcon />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="address-recipient">
+                          {address.recipientName}
+                        </p>
+                        <p>
+                          {address.line1}
+                          {address.line2 ? `, ${address.line2}` : ""}
+                          {address.line3 ? `, ${address.line3}` : ""}
+                        </p>
+                        {(address.city || address.state) && (
+                          <p>
+                            {address.city}
+                            {address.city && address.state ? ", " : ""}
+                            {address.state}
+                          </p>
+                        )}
+                      </>
                     )}
+                    <div className="address-card-actions">
+                      <button
+                        type="button"
+                        className="icon-action icon-edit"
+                        title="Edit label"
+                        aria-label="Edit label"
+                        disabled={busyAddressId === address.id}
+                        onClick={() => startEditAddress(address)}
+                      >
+                        <EditIcon />
+                      </button>
+                      <button
+                        type="button"
+                        className="icon-action icon-delete"
+                        title="Delete address"
+                        aria-label="Delete address"
+                        disabled={busyAddressId === address.id}
+                        onClick={() => removeAddress(address.id)}
+                      >
+                        <DeleteIcon />
+                      </button>
+                    </div>
                   </article>
                 ))}
               </div>

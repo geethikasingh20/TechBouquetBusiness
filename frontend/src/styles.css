@@ -483,6 +483,75 @@ main {
   gap: 8px;
 }
 
+.address-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.address-edit-form {
+  display: grid;
+  gap: 10px;
+  padding: 10px 0 4px;
+}
+
+.address-edit-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.address-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.icon-action {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #f4d9c2;
+  background: #fff;
+  color: #8a5e22;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.icon-action svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-edit {
+  color: #8a5e22;
+}
+
+.icon-save {
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.icon-cancel {
+  color: #b42318;
+  border-color: #fecaca;
+}
+
+.icon-delete {
+  color: #b42318;
+  border-color: #fecaca;
+}
+
 .address-card-head {
   display: flex;
   justify-content: space-between;
@@ -1130,6 +1199,13 @@ body {
   margin-top: 6px;
   font-size: 12px;
   color: #b42318;
+}
+
+.field-success {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #166534;
 }
 
 

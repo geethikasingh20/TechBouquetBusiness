@@ -40,7 +40,15 @@ export async function apiFetch(path, options = {}) {
   }
 
   if (response.status === 204) return null;
-  return response.json();
+
+  const text = await response.text();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 export async function loginApi(payload) {
@@ -225,6 +233,27 @@ export async function saveAddress(address, token) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(address),
+  });
+}
+
+export async function updateAddress(addressId, address, token) {
+  return apiFetch(`/api/address/${addressId}`, {
+    method: "PATCH",
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(address),
+  });
+}
+
+export async function deleteAddress(addressId, token) {
+  return apiFetch(`/api/address/${addressId}`, {
+    method: "DELETE",
+    authRedirectOn401: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 

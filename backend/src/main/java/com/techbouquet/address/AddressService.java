@@ -57,6 +57,56 @@ public class AddressService {
         return mapToResponse(saved);
     }
 
+    public AddressResponse updateAddress(Long addressId, AddressRequest request, Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        Customer customer = customerRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Address address = addressRepository.findByIdAndCustomerId(addressId, customer.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+
+        String incomingLabel = request.label() == null ? "" : request.label().trim();
+        String effectiveLabel = address.getLabel();
+        if (!incomingLabel.isBlank() && !incomingLabel.equals(address.getLabel())) {
+            boolean duplicateLabel = addressRepository.existsByCustomerIdAndLabelAndIdNot(
+                    customer.getId(), incomingLabel, addressId);
+            if (duplicateLabel) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Address label must be unique");
+            }
+            effectiveLabel = incomingLabel;
+        }
+
+        address.setLabel(effectiveLabel);
+        address.setRecipientName(request.recipientName());
+        address.setPhone(request.recipientPhone());
+        address.setAddressLine1(request.line1());
+        address.setAddressLine2(request.line2());
+        address.setLandmark(request.line3());
+        address.setCity(request.city());
+        address.setState(request.state());
+        address.setPincode(request.pincode());
+
+        Address saved = addressRepository.save(address);
+        return mapToResponse(saved);
+    }
+
+    public void deleteAddress(Long addressId, Principal principal) {
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        Customer customer = customerRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Address address = addressRepository.findByIdAndCustomerId(addressId, customer.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+
+        addressRepository.delete(address);
+    }
+
     public List<AddressResponse> getAddresses(Long customerId) {
 
         List<AddressResponse> add= addressRepository.findByCustomerId(customerId)
