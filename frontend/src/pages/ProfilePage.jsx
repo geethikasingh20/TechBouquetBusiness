@@ -65,6 +65,7 @@ export default function ProfilePage() {
   const [addressActionMessage, setAddressActionMessage] = useState("");
   const [addressActionError, setAddressActionError] = useState("");
   const [busyAddressId, setBusyAddressId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState("");
@@ -187,10 +188,6 @@ export default function ProfilePage() {
 
   const removeAddress = async (addressId) => {
     if (!user?.token) return;
-    if (!window.confirm("Delete this address?")) {
-      return;
-    }
-
     setBusyAddressId(addressId);
     setAddressActionError("");
     setAddressActionMessage("");
@@ -207,6 +204,23 @@ export default function ProfilePage() {
     } finally {
       setBusyAddressId(null);
     }
+  };
+
+  const requestDeleteAddress = (address) => {
+    setDeleteTarget(address);
+    setAddressActionError("");
+    setAddressActionMessage("");
+  };
+
+  const cancelDeleteAddress = () => {
+    setDeleteTarget(null);
+  };
+
+  const confirmDeleteAddress = async () => {
+    if (!deleteTarget) return;
+    const addressId = deleteTarget.id;
+    setDeleteTarget(null);
+    await removeAddress(addressId);
   };
 
   const isVerified = !!profile?.emailVerified;
@@ -367,7 +381,7 @@ export default function ProfilePage() {
                         title="Delete address"
                         aria-label="Delete address"
                         disabled={busyAddressId === address.id}
-                        onClick={() => removeAddress(address.id)}
+                        onClick={() => requestDeleteAddress(address)}
                       >
                         <DeleteIcon />
                       </button>
@@ -461,6 +475,38 @@ export default function ProfilePage() {
           active !== "My Addresses" &&
           active !== "My Orders" && <p>Content for {active} will appear here.</p>}
       </section>
+      {deleteTarget && (
+        <div className="dialog-overlay" role="presentation">
+          <div
+            className="dialog-box"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-address-title"
+          >
+            <h3 id="delete-address-title">Delete address?</h3>
+            <p>
+              This will permanently remove the address label{" "}
+              <strong>{deleteTarget.label || "Saved Address"}</strong>.
+            </p>
+            <div className="dialog-actions">
+              <button
+                type="button"
+                className="ghost"
+                onClick={cancelDeleteAddress}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="primary"
+                onClick={confirmDeleteAddress}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

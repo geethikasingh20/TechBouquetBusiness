@@ -98,6 +98,41 @@ export default function CheckoutPage() {
     }, {});
   }, [savedAddresses]);
 
+  const usedAddressLabels = useMemo(() => {
+    return new Set(
+      savedAddresses
+        .map((address) => address?.label?.trim().toLowerCase())
+        .filter(Boolean),
+    );
+  }, [savedAddresses]);
+
+  const availableAddressLabelOptions = useMemo(() => {
+    return addressLabelOptions.filter(
+      (option) => !usedAddressLabels.has(option.toLowerCase()),
+    );
+  }, [addressLabelOptions, usedAddressLabels]);
+
+  useEffect(() => {
+    setRecipientData((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      for (const [pincode, recipient] of Object.entries(prev)) {
+        const labelKey = recipient?.label?.trim().toLowerCase();
+        if (recipient?.saveAddress && labelKey && usedAddressLabels.has(labelKey)) {
+          next[pincode] = {
+            ...recipient,
+            label: "",
+            saveAddress: false,
+          };
+          changed = true;
+        }
+      }
+
+      return changed ? next : prev;
+    });
+  }, [usedAddressLabels]);
+
   const updateRecipient = (pincode, field, value) => {
     setRecipientData((prev) => ({
       ...prev,
@@ -580,32 +615,40 @@ export default function CheckoutPage() {
                     <div className="save-address-label-title">
                       Choose label for saved address
                     </div>
-                    <div className="save-address-options">
-                      {addressLabelOptions.map((option) => (
-                        <label key={option} className="save-address-option">
-                          <input
-                            type="radio"
-                            name={`address-label-${pincode}`}
-                            value={option}
-                            checked={recipientData[pincode]?.label === option}
-                            onChange={(e) =>
-                              setRecipientData((prev) => ({
-                                ...prev,
-                                [pincode]: {
-                                  ...prev[pincode],
-                                  label: e.target.value,
-                                  saveAddress: true,
-                                },
-                              }))
-                            }
-                          />
-                          {option}
-                        </label>
-                      ))}
-                    </div>
-                    <small>
-                      Select one of the common labels to save this address.
-                    </small>
+                    {availableAddressLabelOptions.length > 0 ? (
+                      <>
+                        <div className="save-address-options">
+                          {availableAddressLabelOptions.map((option) => (
+                            <label key={option} className="save-address-option">
+                              <input
+                                type="radio"
+                                name={`address-label-${pincode}`}
+                                value={option}
+                                checked={recipientData[pincode]?.label === option}
+                                onChange={(e) =>
+                                  setRecipientData((prev) => ({
+                                    ...prev,
+                                    [pincode]: {
+                                      ...prev[pincode],
+                                      label: e.target.value,
+                                      saveAddress: true,
+                                    },
+                                  }))
+                                }
+                              />
+                              {option}
+                            </label>
+                          ))}
+                        </div>
+                        <small>
+                          Select one of the common labels to save this address.
+                        </small>
+                      </>
+                    ) : (
+                      <small>
+                        All common labels are already used in your address book.
+                      </small>
+                    )}
                   </div>
                   {errors[pincode]?.label && (
                     <div className="field-error">{errors[pincode].label}</div>
