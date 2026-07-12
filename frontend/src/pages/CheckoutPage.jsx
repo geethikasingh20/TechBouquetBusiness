@@ -5,7 +5,7 @@ import "../styles/CheckoutPageStyleNew.css";
 import {
   createOrder,
   fetchAddresses,
-  orderReceiptUrl,
+  openOrderReceiptInNewTab,
   saveAddress,
 } from "../data/api";
 import { useAuth } from "../context/AuthContext";
@@ -50,6 +50,7 @@ export default function CheckoutPage() {
   const [receiptError, setReceiptError] = useState("");
   const [orderError, setOrderError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(null);
+  const [receiptViewError, setReceiptViewError] = useState("");
   const getAddonUnitTotal = (item) =>
     (item.addons || []).reduce(
       (sum, addon) => sum + Number(addon?.price || 0),
@@ -464,14 +465,25 @@ export default function CheckoutPage() {
           </p>
           <p>
             Receipt:{" "}
-            <a
-              href={orderReceiptUrl(orderSuccess.orderNumber)}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              className="text-link-button"
+              onClick={async () => {
+                setReceiptViewError("");
+                try {
+                  await openOrderReceiptInNewTab(
+                    user.token,
+                    orderSuccess.orderNumber,
+                  );
+                } catch (error) {
+                  setReceiptViewError(error.message || "Failed to open receipt");
+                }
+              }}
             >
               View uploaded receipt
-            </a>
+            </button>
           </p>
+          {receiptViewError && <p className="field-error">{receiptViewError}</p>}
           <div className="checkout-success-actions">
             <button className="primary" onClick={() => navigate("/profile")}>
               View Order History

@@ -5,7 +5,7 @@ import {
   deleteAddress,
   fetchAddresses,
   fetchOrders,
-  orderReceiptUrl,
+  openOrderReceiptInNewTab,
   updateAddress,
 } from "../data/api";
 
@@ -69,6 +69,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState("");
+  const [receiptActionError, setReceiptActionError] = useState("");
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
@@ -107,6 +108,7 @@ export default function ProfilePage() {
     setEditingLabel("");
     setAddressActionMessage("");
     setAddressActionError("");
+    setReceiptActionError("");
   }, [active]);
 
   useEffect(() => {
@@ -432,19 +434,29 @@ export default function ProfilePage() {
                     </div>
                     {order.receiptUrl && (
                       <p>
-                        Receipt:{" "}
-                        <a
-                          href={
-                            order.receiptUrl.startsWith("/")
-                              ? orderReceiptUrl(order.orderNumber)
-                              : order.receiptUrl
-                          }
-                          target="_blank"
-                          rel="noreferrer"
+                        <button
+                          type="button"
+                          className="text-link-button"
+                          onClick={async () => {
+                            setReceiptActionError("");
+                            try {
+                              await openOrderReceiptInNewTab(
+                                user.token,
+                                order.orderNumber,
+                              );
+                            } catch (error) {
+                              setReceiptActionError(
+                                error.message || "Failed to open receipt",
+                              );
+                            }
+                          }}
                         >
                           View receipt
-                        </a>
+                        </button>
                       </p>
+                    )}
+                    {receiptActionError && (
+                      <p className="field-error">{receiptActionError}</p>
                     )}
                     <div className="order-groups">
                       {Object.entries(itemsByPincode).map(([pincode, items]) => (

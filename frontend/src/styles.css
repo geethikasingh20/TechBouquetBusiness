@@ -589,6 +589,20 @@ main {
   flex-wrap: wrap;
 }
 
+.text-link-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #8a5e22;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.text-link-button:hover {
+  color: #6f4718;
+}
+
 .address-card-head {
   display: flex;
   justify-content: space-between;

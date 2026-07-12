@@ -299,3 +299,39 @@ export async function updateOrderStatus(token, orderNumber, status) {
 export function orderReceiptUrl(orderNumber) {
   return `${API_BASE}/api/orders/${orderNumber}/receipt`;
 }
+
+export async function fetchOrderReceiptBlob(token, orderNumber, admin = false) {
+  const path = admin
+    ? `/api/orders/${orderNumber}/receipt/admin`
+    : `/api/orders/${orderNumber}/receipt`;
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    let message = text || "Request failed";
+    try {
+      const parsed = JSON.parse(text);
+      message = parsed?.message || parsed?.error || message;
+    } catch {
+      // Keep raw response text when it is not JSON.
+    }
+    throw new Error(message);
+  }
+
+  return response.blob();
+}
+
+export async function openOrderReceiptInNewTab(token, orderNumber, admin = false) {
+  const blob = await fetchOrderReceiptBlob(token, orderNumber, admin);
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, "_blank", "noopener,noreferrer");
+  if (!win) {
+    throw new Error("Popup blocked. Please allow popups to view the receipt.");
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  return url;
+}
