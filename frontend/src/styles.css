@@ -2545,3 +2545,23 @@ body {
   background: rgba(255, 255, 255, 0.6);
   border-radius: inherit;
 }
+
+.checkout-cta {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.order-total {
+  display: flex;
+  width: calc((100% / 5) * 4);
+}
+
+.cart-col {
+  flex: 1; /* Makes all 5 columns equal width */
+}
+
+.below-total {
+  margin-left: auto; /* Pushes the strong tag under the last column */
+}

@@ -212,17 +212,24 @@ export default function CartPage() {
               </section>
             ),
           )}
+          <div class="order-total">
+            <strong class="below-total"> Total: Rs. {total}</strong>
+          </div>
           <div className="cart-summary">
             <button className="ghost" onClick={clearCart}>
               Clear Cart
             </button>
-            <strong>Order Total: Rs. {total}</strong>
-            <button className="primary" onClick={() => navigate(checkoutLink)}>
-              Checkout
-            </button>
-            <Link to="/checkout">
+            {/*<Link to="/checkout">
               <button className="primary">Checkout</button>
-            </Link>
+            </Link>*/}{" "}
+            <div class="checkout-cta">
+              <button
+                className="primary"
+                onClick={() => navigate(checkoutLink)}
+              >
+                Checkout
+              </button>
+            </div>
           </div>
         </div>
       )}
