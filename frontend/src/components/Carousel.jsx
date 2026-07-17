@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import slide1 from "../assets/carousel1.png";
-import slide2 from "../assets/carousel2.jpg";
 
+import slide5 from "../assets/carousel5.png";
 import slide6 from "../assets/c6.jpg";
 
 const slides = [slide5, slide6];
