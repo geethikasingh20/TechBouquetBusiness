@@ -1474,6 +1474,52 @@ body {
   padding: 12px 8vw 48px;
 }
 
+.home-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.home-bestsellers-shell {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 18px;
+}
+
+.home-featured-shell {
+  position: relative;
+  overflow: hidden;
+  padding-top: 18px;
+}
+
+.home-bestsellers-shell::before,
+.home-featured-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  width: 100%;
+}
+
+.home-bestsellers-shell::before {
+  background-image: url("./assets/carousel5.png");
+  opacity: 0.18;
+}
+
+.home-bestsellers-shell > *,
+.home-featured-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-page > * {
+  position: relative;
+  z-index: 1;
+}
+
 .category-bar {
   margin-top: 4px;
   margin-bottom: 2px;
@@ -2564,4 +2610,38 @@ body {
 
 .below-total {
   margin-left: auto; /* Pushes the strong tag under the last column */
+}
+
+/* The main container holding your content */
+.transparent-background-box {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  min-height: 300px;
+  margin: 20px auto;
+  padding: 40px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  overflow: hidden; /* Keeps the pseudo-element inside the box borders */
+}
+
+/* The pseudo-element that handles the background image and opacity */
+.transparent-background-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Pushes the image behind the text */
+  background-image: url("image.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3; /* Adjust this value between 0.0 (invisible) and 1.0 (fully visible) */
+}
+
+/* Styling for the content inside the box */
+.content {
+  color: #333333;
+  font-family: sans-serif;
 }

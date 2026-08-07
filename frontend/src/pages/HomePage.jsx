@@ -4,32 +4,34 @@ import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
 import { fetchProductSummariesCached } from "../data/api";
 
-
 export default function HomePage() {
   const bestsellerCategories = ["Bouquets", "Plants", "Cakes", "Gift Hampers"];
 
-const buildBestsellers = (items) => {
-  const normalized = Array.isArray(items) ? items : [];
-  const picks = [];
-  bestsellerCategories.forEach((category) => {
-    const matches = normalized.filter((product) =>
-      (product.category || "").toLowerCase() === category.toLowerCase()
+  const buildBestsellers = (items) => {
+    const normalized = Array.isArray(items) ? items : [];
+    const picks = [];
+    bestsellerCategories.forEach((category) => {
+      const matches = normalized.filter(
+        (product) =>
+          (product.category || "").toLowerCase() === category.toLowerCase(),
+      );
+      picks.push(...matches.slice(0, 2));
+    });
+
+    const remaining = normalized.filter(
+      (product) => !picks.some((p) => p.id === product.id),
     );
-    picks.push(...matches.slice(0, 2));
-  });
+    picks.push(...remaining.slice(0, 8 - picks.length));
 
-  const remaining = normalized.filter((product) => !picks.some((p) => p.id === product.id));
-  picks.push(...remaining.slice(0, 8 - picks.length));
+    return picks.map((product) => ({
+      id: product.id,
+      name: product.name,
+      image: product.images?.[0]?.url || product.images?.[0],
+      link: `/product/${product.id}`,
+    }));
+  };
 
-  return picks.map((product) => ({
-    id: product.id,
-    name: product.name,
-    image: product.images?.[0]?.url || product.images?.[0],
-    link: `/product/${product.id}`
-  }));
-};
-
-const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ const [products, setProducts] = useState([]);
         const { items } = await fetchProductSummariesCached();
         const normalized = (items || []).map((item) => ({
           ...item,
-          images: item.imageUrl ? [{ url: item.imageUrl }] : []
+          images: item.imageUrl ? [{ url: item.imageUrl }] : [],
         }));
         setProducts(normalized);
         setBestsellers(buildBestsellers(normalized));
@@ -53,12 +55,14 @@ const [products, setProducts] = useState([]);
   }, []);
 
   return (
-    <div className="page">
-      <Carousel />
+    <div className="page home-page">
+      <div className="home-bestsellers-shell">
+        <Carousel />
 
-      <Marquee title="Bestsellers" items={bestsellers} />
+        <Marquee title="Bestsellers" items={bestsellers} />
+      </div>
 
-      <section className="featured">
+      <section className="featured home-featured-shell">
         <h3>Featured Products</h3>
         {loading ? (
           <p>Loading products...</p>
